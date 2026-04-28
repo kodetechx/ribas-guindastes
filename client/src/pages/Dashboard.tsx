@@ -3,7 +3,7 @@ import { Truck, AlertTriangle, FileWarning, CheckSquare, Clock, User } from 'luc
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import api from '../services/api';
 
-// Dados mock para os gráficos (já que os endpoints de séries temporais serão implementados futuramente)
+// Dados mock para os gráficos
 const MOCK_UTILIZATION = [
   { name: 'Ativos', value: 12 },
   { name: 'Manutenção', value: 3 },
@@ -18,7 +18,6 @@ const MOCK_COSTS = [
 ];
 
 const COLORS = ['#1E3A8A', '#F59E0B', '#EF4444'];
-...
 
 const Dashboard = () => {
   const [stats, setStats] = useState<any>(null);

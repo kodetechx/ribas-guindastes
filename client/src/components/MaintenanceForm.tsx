@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Save, Calendar, Tool } from 'lucide-react';
+import { X, Save, Calendar, Wrench } from 'lucide-react';
 import api from '../services/api';
 
 interface MaintenanceFormProps {
@@ -44,7 +44,7 @@ const MaintenanceForm: React.FC<MaintenanceFormProps> = ({ equipmentId, onClose,
       <div className="bg-white rounded-sm w-full max-w-lg shadow-xl fade-in">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h3 className="text-lg font-black uppercase tracking-tight text-blue-900 flex items-center gap-2">
-            <Tool size={20} />
+            <Wrench size={20} />
             Registrar Manutenção
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">

@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import EquipmentList from './pages/EquipmentList';
 import EquipmentDetail from './pages/EquipmentDetail';
 import OperatorList from './pages/OperatorList';
+import OperatorDetail from './pages/OperatorDetail';
 import ChecklistExecution from './pages/ChecklistExecution';
 import MyDocuments from './pages/MyDocuments';
 import ServicesList from './pages/ServicesList';
@@ -54,6 +55,14 @@ function App() {
             <ProtectedRoute roles={['admin', 'manager']}>
               <Layout>
                 <OperatorList />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/operadores/:id" element={
+            <ProtectedRoute roles={['admin', 'manager']}>
+              <Layout>
+                <OperatorDetail />
               </Layout>
             </ProtectedRoute>
           } />

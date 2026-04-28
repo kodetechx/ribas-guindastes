@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Truck, Calendar, Shield, FileText, Settings, AlertTriangle, ClipboardList, CheckCircle, Tool, QrCode } from 'lucide-react';
+import { Truck, Calendar, Settings, AlertTriangle, ClipboardList, CheckCircle, Wrench } from 'lucide-react';
 import api from '../services/api';
 import MaintenanceForm from '../components/MaintenanceForm';
+import DocumentManager from '../components/DocumentManager';
 
 const EquipmentDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -80,7 +81,7 @@ const EquipmentDetail = () => {
             Realizar Checklist
           </Link>
           <button onClick={() => setShowMaintenanceForm(true)} className="btn-industrial btn-secondary">
-            <Tool size={16} />
+            <Wrench size={16} />
             Registrar Manutenção
           </button>
         </div>
@@ -127,10 +128,7 @@ const EquipmentDetail = () => {
 
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-8">
-          {/* Main Grid for History */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            
-            {/* Checklist History */}
             <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
               <h3 className="text-xs font-black mb-6 border-b border-gray-100 pb-4 uppercase tracking-widest text-blue-900 flex items-center gap-2">
                 <ClipboardList size={16} />
@@ -160,10 +158,9 @@ const EquipmentDetail = () => {
               )}
             </div>
 
-            {/* Maintenance History */}
             <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
               <h3 className="text-xs font-black mb-6 border-b border-gray-100 pb-4 uppercase tracking-widest text-blue-900 flex items-center gap-2">
-                <Tool size={16} />
+                <Wrench size={16} />
                 Histórico de Manutenção
               </h3>
               {maintenances.length > 0 ? (
@@ -189,16 +186,12 @@ const EquipmentDetail = () => {
                   <p className="text-gray-400 text-xs font-bold uppercase italic">Nenhum registro de manutenção</p>
                 </div>
               )}
-            import MaintenanceForm from '../components/MaintenanceForm';
-            import DocumentManager from '../components/DocumentManager'; // Import adicionado
+            </div>
+          </div>
 
-            const EquipmentDetail = () => {
-            ...
-                      {/* Action Cards / Docs Placeholder */}
-                      <DocumentManager ownerId={id!} category="equipment" />
-                    </div>
-                  </div>
-            ...
+          <DocumentManager ownerId={id!} category="equipment" />
+        </div>
+      </div>
 
       {showMaintenanceForm && (
         <MaintenanceForm 
