@@ -3,3 +3,6 @@ server/src/.env
 
 # Recomendado: ignorar qualquer .env em qualquer subpasta
 **/.env
+
+GEMINI.md
+VISUAL.md
