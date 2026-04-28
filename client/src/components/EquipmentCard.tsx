@@ -9,54 +9,56 @@ interface Props {
 
 const EquipmentCard: React.FC<Props> = ({ equipment }) => {
   const statusStyles = {
-    active: { bg: 'bg-green-500/10', text: 'text-green-500', icon: CheckCircle, label: 'Ativo' },
-    maintenance: { bg: 'bg-yellow-500/10', text: 'text-yellow-500', icon: Clock, label: 'Manutenção' },
-    blocked: { bg: 'bg-red-500/10', text: 'text-red-500', icon: AlertCircle, label: 'Bloqueado' },
+    active: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', icon: CheckCircle, label: 'Ativo' },
+    maintenance: { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-200', icon: Clock, label: 'Manutenção' },
+    blocked: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', icon: AlertCircle, label: 'Bloqueado' },
   };
 
   const style = statusStyles[equipment.status];
   const Icon = style.icon;
 
   return (
-    <div className="bg-industrial-gray/30 border border-gray-800 rounded-lg p-5 hover:border-industrial-yellow/50 transition-colors group">
-      <div className="flex justify-between items-start mb-4">
-        <div className={`p-3 rounded-lg ${style.bg} ${style.text}`}>
+    <div className="bg-white border border-gray-200 rounded-sm p-6 hover:border-blue-900/30 transition-all flex flex-col h-full shadow-sm">
+      <div className="flex justify-between items-start mb-6">
+        <div className="p-3 bg-gray-50 border border-gray-100 rounded-sm text-gray-400">
           <Truck size={24} />
         </div>
-        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${style.bg} ${style.text}`}>
-          <Icon size={14} />
+        <div className={`flex items-center gap-1.5 px-3 py-1 border ${style.border} ${style.bg} ${style.text} rounded-sm text-[10px] font-black uppercase tracking-widest`}>
+          <Icon size={12} strokeWidth={3} />
           {style.label}
         </div>
       </div>
 
-      <Link to={`/equipamentos/${equipment._id}`}>
-        <h3 className="text-xl font-bold mb-1 group-hover:text-industrial-yellow transition-colors">
-          {equipment.name}
-        </h3>
-      </Link>
-      <p className="text-gray-400 text-sm mb-4">
-        {equipment.brand} {equipment.model} • {equipment.year}
-      </p>
+      <div className="flex-1">
+        <Link to={`/equipamentos/${equipment._id}`}>
+          <h3 className="text-xl font-black text-gray-900 hover:text-blue-900 transition-colors mb-1 uppercase tracking-tight">
+            {equipment.name}
+          </h3>
+        </Link>
+        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-6">
+          {equipment.brand} {equipment.model} • {equipment.year}
+        </p>
 
-      <div className="pt-4 border-t border-gray-800 grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Série</p>
-          <p className="text-sm font-mono text-gray-300">{equipment.serialNumber}</p>
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Próx. Manut.</p>
-          <p className="text-sm text-gray-300">
-            {equipment.nextMaintenance ? new Date(equipment.nextMaintenance).toLocaleDateString() : 'N/D'}
-          </p>
+        <div className="grid grid-cols-2 gap-4 py-4 border-t border-gray-100">
+          <div>
+            <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-1">Série</p>
+            <p className="text-xs font-mono font-bold text-gray-700">{equipment.serialNumber}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-1">Próx. Manut.</p>
+            <p className="text-xs font-bold text-gray-700">
+              {equipment.nextMaintenance ? new Date(equipment.nextMaintenance).toLocaleDateString() : '---'}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 pt-4 border-t border-gray-100">
         <Link
           to={`/checklist/${equipment._id}`}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-industrial-gray/40 border border-gray-700 rounded text-sm font-bold hover:bg-industrial-yellow hover:text-black hover:border-industrial-yellow transition-all"
+          className="w-full flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 text-blue-900 text-xs font-black uppercase tracking-widest hover:bg-blue-900 hover:text-white hover:border-blue-900 transition-all rounded-sm"
         >
-          <ClipboardList size={18} />
+          <ClipboardList size={16} />
           Realizar Checklist
         </Link>
       </div>

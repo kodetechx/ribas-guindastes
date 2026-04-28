@@ -177,11 +177,22 @@ const ChecklistExecution = () => {
           </div>
         )}
 
-        {error && <p className="text-red-500 font-bold">{error}</p>}
+        {error && (
+          <div className="bg-red-500/10 border-l-4 border-red-500 p-4 rounded flex gap-3 animate-pulse">
+            <AlertTriangle className="text-red-500 shrink-0" />
+            <div>
+              <p className="text-red-500 font-bold">Bloqueio de Segurança</p>
+              <p className="text-red-500/80 text-sm">{error}</p>
+            </div>
+          </div>
+        )}
 
         <button
           type="submit"
-          className="w-full py-4 bg-industrial-yellow text-black font-bold rounded-lg hover:bg-yellow-500 transition-colors uppercase tracking-widest flex items-center justify-center gap-2"
+          disabled={!!error && error.includes('bloqueada')}
+          className={`w-full py-4 bg-industrial-yellow text-black font-bold rounded-lg hover:bg-yellow-500 transition-colors uppercase tracking-widest flex items-center justify-center gap-2 ${
+            error && error.includes('bloqueada') ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           <Check size={20} />
           Finalizar e Enviar Checklist

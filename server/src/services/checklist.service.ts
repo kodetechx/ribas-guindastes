@@ -1,5 +1,7 @@
 import { ChecklistRepository } from '../repositories/checklist.repository';
 import { IChecklist } from '../models/Checklist';
+import Equipment from '../models/Equipment';
+import Operator from '../models/Operator';
 
 const repository = new ChecklistRepository();
 
@@ -17,6 +19,25 @@ export class ChecklistService {
   }
 
   async createChecklist(data: Partial<IChecklist>) {
+    // 1. Validar se o equipamento existe e está apto
+    const equipment = await Equipment.findById(data.equipment);
+    if (!equipment) throw new Error('Equipamento não encontrado');
+
+    // Regra: Não permitir checklist se a manutenção estiver vencida
+    if (equipment.nextMaintenance && equipment.nextMaintenance < new Date()) {
+      throw new Error('Equipamento com manutenção vencida. Operação bloqueada.');
+    }
+
+    // 2. Validar NRs do operador
+    const operator = await Operator.findById(data.operator);
+    if (!operator) throw new Error('Operador não encontrado');
+
+    const now = new Date();
+    const expiredNR = operator.nrs.find(nr => nr.expiresAt < now);
+    if (expiredNR) {
+      throw new Error(`Operador possui certificação ${expiredNR.type} vencida.`);
+    }
+
     // Check if equipment already has a checklist today
     const todayChecklist = await repository.findTodayByEquipment(data.equipment as any);
     if (todayChecklist) {

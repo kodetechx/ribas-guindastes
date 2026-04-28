@@ -37,6 +37,23 @@ export class StatsController {
         nextMaintenance: { $lte: nextWeek, $gte: new Date() }
       }).select('name nextMaintenance');
 
+      // Expiring Operator Documents (next 30 days)
+      const nextMonth = new Date();
+      nextMonth.setDate(nextMonth.getDate() + 30);
+      const expiringDocs = await Operator.find({
+        "nrs.expiresAt": { $lte: nextMonth, $gte: new Date() }
+      }).select('name nrs');
+
+      // Flatten documents into alerts
+      const documentAlerts = expiringDocs.flatMap(op => 
+        op.nrs.filter(nr => nr.expiresAt <= nextMonth && nr.expiresAt >= new Date())
+          .map(nr => ({
+            operatorName: op.name,
+            docType: nr.type,
+            expiresAt: nr.expiresAt
+          }))
+      );
+
       res.status(200).json({
         equipments: {
           total: totalEquipments,
@@ -52,7 +69,8 @@ export class StatsController {
           recent: recentChecklists
         },
         alerts: {
-          upcomingMaintenances
+          upcomingMaintenances,
+          documentAlerts
         }
       });
     } catch (error: any) {

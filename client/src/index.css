@@ -1,71 +1,54 @@
 @import "tailwindcss";
 
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #0F0F0F;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
+  color: #1A1A1A;
+  background-color: #FFFFFF;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #0F0F0F;
+  background-color: #FAFAFA;
 }
 
 @theme {
-  --color-industrial-yellow: #facc15;
-  --color-industrial-dark: #0F0F0F;
-  --color-industrial-gray: #1F1F1F;
+  --color-industrial-yellow: #facc15; /* Botões de ação críticos */
+  --color-industrial-dark: #FFFFFF;
+  --color-industrial-gray: #E0E0E0;
+  --color-primary: #1E3A8A; /* Azul Corporativo */
 }
 
-/* Custom Scrollbar */
+/* Scrollbar profissional */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #0F0F0F;
+  background: #F5F5F5;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #2A2A2A;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #facc15;
+  background: #BDBDBD;
+  border-radius: 2px;
 }
 
 /* Utilities */
 .btn-industrial {
-  @apply px-6 py-3 font-bold uppercase tracking-widest text-xs transition-all duration-200 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 rounded-lg;
+  @apply px-4 py-2 font-bold uppercase tracking-widest text-[10px] transition-all duration-200 border border-gray-300 rounded-sm flex items-center justify-center gap-2;
 }
 
 .btn-primary {
-  @apply bg-industrial-yellow text-industrial-dark hover:bg-yellow-400 shadow-lg shadow-yellow-500/10;
+  @apply bg-blue-900 text-white hover:bg-blue-800 border-none;
 }
 
 .btn-secondary {
-  @apply bg-industrial-gray text-white border border-gray-800 hover:bg-gray-800;
+  @apply bg-white text-gray-700 hover:bg-gray-100 border border-gray-300;
 }
 
-/* Page transitions/animations */
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.card-industrial {
+  @apply bg-white border border-gray-200 rounded-sm p-4 shadow-none;
 }

@@ -20,76 +20,71 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-industrial-dark border-b border-gray-800 flex items-center justify-between px-6 z-50">
-        <h1 className="text-xl font-bold text-industrial-yellow italic tracking-tighter">RIBAS</h1>
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-50">
+        <h1 className="text-xl font-black text-blue-900 tracking-tighter">RIBAS</h1>
         <div className="flex items-center gap-4">
-          {user?.role === 'operator' && (
-            <Link to="/meus-documentos" className="p-2 bg-industrial-yellow/10 text-industrial-yellow rounded">
-              <FileBadge size={20} />
-            </Link>
-          )}
-          <button onClick={logout} className="text-gray-400">
+          <button onClick={logout} className="text-gray-500">
             <LogOut size={20} />
           </button>
         </div>
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 h-screen w-64 bg-industrial-dark border-r border-gray-800 text-white hidden md:flex flex-col z-50">
-        <div className="p-6 border-b border-gray-800">
-          <h1 className="text-2xl font-bold text-industrial-yellow italic tracking-tighter">RIBAS</h1>
-          <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest">Gestão Operacional</p>
+      <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 text-gray-800 hidden md:flex flex-col z-50">
+        <div className="p-8 border-b border-gray-100">
+          <h1 className="text-2xl font-black text-blue-900 tracking-tighter">RIBAS</h1>
+          <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-[0.2em]">Sistemas Industriais</p>
         </div>
 
-        <nav className="flex-1 mt-6">
+        <nav className="flex-1 mt-4">
           {filteredItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-6 py-4 transition-colors ${
+              className={`flex items-center gap-3 px-8 py-3.5 transition-all text-sm font-semibold ${
                 location.pathname === item.path
-                  ? 'bg-industrial-gray border-l-4 border-industrial-yellow text-white'
-                  : 'text-gray-400 hover:bg-industrial-gray/50 hover:text-white'
+                  ? 'bg-gray-50 text-blue-900 border-r-4 border-blue-900'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <item.icon size={20} />
-              <span className="font-medium">{item.label}</span>
+              <item.icon size={18} strokeWidth={2.5} />
+              <span>{item.label}</span>
             </Link>
           ))}
         </nav>
 
-        <div className="p-6 border-t border-gray-800">
-          <div className="flex items-center gap-3 mb-6 px-2">
-            <div className="w-8 h-8 rounded-full bg-industrial-yellow/20 flex items-center justify-center text-industrial-yellow font-bold text-xs">
+        <div className="p-8 border-t border-gray-100">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-sm bg-blue-900 flex items-center justify-center text-white font-bold">
               {user?.name.charAt(0)}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-bold truncate">{user?.name}</p>
-              <p className="text-[10px] text-gray-500 uppercase">{user?.role}</p>
+              <p className="text-sm font-bold text-gray-900 truncate">{user?.name}</p>
+              <p className="text-[10px] text-gray-400 uppercase font-black">{user?.role}</p>
             </div>
           </div>
           <button 
             onClick={logout}
-            className="flex items-center gap-3 text-gray-400 hover:text-red-400 transition-colors w-full px-2"
+            className="flex items-center gap-3 text-gray-500 hover:text-red-600 transition-colors w-full text-xs font-bold uppercase tracking-widest"
           >
-            <LogOut size={20} />
-            <span className="font-medium">Sair</span>
+            <LogOut size={16} />
+            <span>Encerrar Sessão</span>
           </button>
         </div>
       </aside>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-industrial-dark border-t border-gray-800 flex justify-around items-center z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex justify-around items-center z-50">
         {filteredItems.slice(0, 4).map((item) => (
           <Link
             key={item.path}
             to={item.path}
-            className={`flex flex-col items-center gap-1 transition-colors ${
-              location.pathname === item.path ? 'text-industrial-yellow' : 'text-gray-500'
+            className={`flex flex-col items-center gap-1 ${
+              location.pathname === item.path ? 'text-blue-900' : 'text-gray-400'
             }`}
           >
             <item.icon size={20} />
-            <span className="text-[10px] font-bold uppercase tracking-tighter">{item.label}</span>
+            <span className="text-[9px] font-bold uppercase">{item.label}</span>
           </Link>
         ))}
       </nav>
