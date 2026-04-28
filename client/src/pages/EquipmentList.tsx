@@ -4,37 +4,53 @@ import { equipmentService } from '../services/equipmentService';
 import type { Equipment } from '../services/equipmentService';
 import EquipmentCard from '../components/EquipmentCard';
 
+import EquipmentForm from '../components/EquipmentForm';
+
 const EquipmentList = () => {
   const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+
+  const fetchEquipments = async () => {
+    try {
+      setLoading(true);
+      const data = await equipmentService.getAll();
+      setEquipments(data);
+    } catch (error) {
+      console.error('Erro ao buscar equipamentos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEquipments = async () => {
-      try {
-        const data = await equipmentService.getAll();
-        setEquipments(data);
-      } catch (error) {
-        console.error('Erro ao buscar equipamentos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchEquipments();
   }, []);
+
+  const handleEdit = (eq: Equipment) => {
+    setEditingEquipment(eq);
+    setShowForm(true);
+  };
 
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight">Equipamentos</h2>
-          <p className="text-gray-400 mt-1">Gerencie a frota de máquinas e veículos.</p>
+          <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight">Equipamentos</h2>
+          <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mt-1">Gerencie a frota de máquinas e veículos.</p>
         </div>
-        <button className="btn-industrial btn-primary flex items-center justify-center gap-2 rounded-md">
-          <Plus size={20} />
+        <button 
+          onClick={() => { setEditingEquipment(null); setShowForm(true); }}
+          className="btn-industrial btn-primary flex items-center justify-center gap-2 rounded-sm"
+        >
+          <Plus size={16} />
           Novo Equipamento
         </button>
       </div>
+
+      {showForm && <EquipmentForm initialData={editingEquipment} onClose={() => setShowForm(false)} onSuccess={fetchEquipments} />}
+...
 
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
@@ -58,7 +74,7 @@ const EquipmentList = () => {
       ) : equipments.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {equipments.map((item) => (
-            <EquipmentCard key={item._id} equipment={item} />
+            <EquipmentCard key={item._id} equipment={item} onRefresh={fetchEquipments} onEdit={handleEdit} />
           ))}
         </div>
       ) : (

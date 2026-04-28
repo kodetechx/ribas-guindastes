@@ -1,13 +1,16 @@
 import React from 'react';
-import { Truck, CheckCircle, AlertCircle, Clock, ClipboardList } from 'lucide-react';
+import { Truck, CheckCircle, AlertCircle, Clock, ClipboardList, Trash2, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Equipment } from '../services/equipmentService';
+import api from '../services/api';
 
 interface Props {
   equipment: Equipment;
+  onRefresh: () => void;
+  onEdit: (eq: Equipment) => void;
 }
 
-const EquipmentCard: React.FC<Props> = ({ equipment }) => {
+const EquipmentCard: React.FC<Props> = ({ equipment, onRefresh, onEdit }) => {
   const statusStyles = {
     active: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', icon: CheckCircle, label: 'Ativo' },
     maintenance: { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-200', icon: Clock, label: 'Manutenção' },
@@ -17,15 +20,34 @@ const EquipmentCard: React.FC<Props> = ({ equipment }) => {
   const style = statusStyles[equipment.status];
   const Icon = style.icon;
 
+  const handleDelete = async () => {
+    if (confirm('Tem certeza que deseja excluir este equipamento?')) {
+      try {
+        await api.delete(`/equipments/${equipment._id}`);
+        onRefresh();
+      } catch (err) {
+        alert('Erro ao excluir equipamento');
+      }
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-sm p-6 hover:border-blue-900/30 transition-all flex flex-col h-full shadow-sm">
       <div className="flex justify-between items-start mb-6">
         <div className="p-3 bg-gray-50 border border-gray-100 rounded-sm text-gray-400">
           <Truck size={24} />
         </div>
-        <div className={`flex items-center gap-1.5 px-3 py-1 border ${style.border} ${style.bg} ${style.text} rounded-sm text-[10px] font-black uppercase tracking-widest`}>
-          <Icon size={12} strokeWidth={3} />
-          {style.label}
+        <div className="flex items-center gap-2">
+            <div className={`flex items-center gap-1.5 px-3 py-1 border ${style.border} ${style.bg} ${style.text} rounded-sm text-[10px] font-black uppercase tracking-widest`}>
+            <Icon size={12} strokeWidth={3} />
+            {style.label}
+            </div>
+            <button onClick={() => onEdit(equipment)} className="p-1.5 text-gray-400 hover:text-blue-900 transition-colors">
+                <Edit size={16} />
+            </button>
+            <button onClick={handleDelete} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors">
+                <Trash2 size={16} />
+            </button>
         </div>
       </div>
 

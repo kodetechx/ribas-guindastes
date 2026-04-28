@@ -3,102 +3,73 @@
 ## 1. Visão Geral
 A plataforma **RIBAS** é um sistema de gestão operacional e documental projetado especificamente para empresas de locação e manutenção de equipamentos pesados. O foco principal é garantir a conformidade com normas de segurança (NRs) e automatizar o controle de campo.
 
-### Objetivos Principais
-*   **Centralização:** Controle total de equipamentos e operadores.
-*   **Segurança:** Bloqueio de operação para equipamentos sem manutenção ou operadores com NRs vencidas.
-*   **Agilidade:** Checklist diário digital via QR Code para operadores em campo.
+---
+
+## 2. Funcionalidades Principais
+
+### A. Gestão de Equipamentos e Operadores
+*   **CRUD Completo:** Cadastro, Edição, Deleção e Visualização de Equipamentos e Operadores.
+*   **Identificação:** Geração de QR Code para cada equipamento, permitindo acesso imediato a checklists e documentos em campo.
+*   **Mídia:** Suporte a upload de fotos/avatares para identificação rápida.
+
+### B. Conformidade e Segurança (Regras de Bloqueio)
+*   **Validação de NRs:** Operadores com certificações vencidas são impedidos de realizar checklists.
+*   **Validação de Manutenção:** Equipamentos com manutenção vencida possuem operação bloqueada.
+*   **Logs de Auditoria:** Registro centralizado de todas as ações críticas (Criação, Atualização e Deleção) para total rastreabilidade.
+
+### C. Gestão Documental e Manutenção
+*   **Upload de Documentos:** Gestão de arquivos associados a operadores e equipamentos, com controle de validade e status (Válido, Vencendo, Vencido).
+*   **Histórico:** Registro completo de manutenções (preventivas/corretivas), incluindo custos e mecânicos responsáveis.
+
+### D. Operacional em Campo
+*   **Checklist Digital:** Registro diário obrigatório com interface adaptada para uso móvel.
+*   **Gestão de Serviços:** Acompanhamento de demandas com trava de duplicidade (um equipamento não pode estar em dois serviços ativos).
+*   **Offline-First:** Uso de *Service Workers* para cache de recursos, garantindo carregamento da interface em áreas sem conexão.
 
 ---
 
-## 2. Arquitetura Técnica
-
-O projeto utiliza uma stack moderna e escalável:
+## 3. Arquitetura Técnica
 
 ### Backend
-*   **Node.js & Express:** Servidor robusto e rápido.
-*   **MongoDB & Mongoose:** Banco NoSQL para flexibilidade no armazenamento de documentos e históricos.
-*   **JWT (JSON Web Token):** Autenticação segura.
-*   **Bcrypt.js:** Criptografia de senhas.
+*   **Node.js + Express:** API RESTful.
+*   **MongoDB + Mongoose:** Estrutura de dados NoSQL.
+*   **Segurança:** Autenticação JWT, Bcrypt, RBAC (Admin, Gestor, Operador).
 
 ### Frontend
-*   **React.js (Vite):** Interface reativa e performática.
-*   **TailwindCSS:** Design industrial, moderno e responsivo.
-*   **Lucide React:** Iconografia técnica e intuitiva.
-*   **Context API:** Gerenciamento de estado global de autenticação.
+*   **React + Vite + TailwindCSS:** UI moderna baseada no estilo "Industrial ERP".
+*   **Bibliotecas:** `recharts` (KPIs), `lucide-react` (iconografia), `axios` (API).
 
 ---
 
-## 3. Estrutura de Pastas
-
-```text
-/RIBAS
-├── /client (Frontend)
-│   ├── /src
-│   │   ├── /components (Componentes reutilizáveis: Sidebar, Layout, Cards)
-│   │   ├── /context (Contexto de Autenticação)
-│   │   ├── /pages (Telas principais: Dashboard, Listas, Detalhes, Checklist)
-│   │   └── /services (Comunicação com a API)
-├── /server (Backend)
-│   ├── /src
-│   │   ├── /controllers (Lógica de entrada/saída)
-│   │   ├── /models (Esquemas do MongoDB: Equipment, Operator, Checklist, Maintenance)
-│   │   ├── /routes (Definição de endpoints)
-│   │   ├── /middleware (Proteção de rotas e RBAC)
-│   │   └── /repositories (Acesso direto ao banco de dados)
-└── /docs (Documentação)
-```
-
----
-
-## 4. Regras de Negócio Implementadas
-
-1.  **Checklist Obrigatório:** Um equipamento só deve operar após a submissão do checklist diário.
-2.  **Controle de Acesso (RBAC):**
-    *   **Admin/Manager:** Acesso total, gestão de usuários e visualização de KPIs.
-    *   **Operator:** Acesso limitado à lista de equipamentos, realização de checklists e consulta de seus próprios documentos.
-3.  **Segurança de Campo:** Se um item crítico do checklist for marcado como "Não Conforme", o sistema gera um alerta visual imediato de bloqueio.
-
----
-
-## 5. Guia de Instalação e Execução
-
-### Pré-requisitos
-*   Node.js (v18+)
-*   MongoDB (Local ou Atlas)
-
-### Configuração do Servidor
-1.  Entre na pasta `/server`.
-2.  Crie um arquivo `.env` baseado no exemplo:
-    ```env
-    MONGODB_URI=mongodb://localhost:27017/ribas
-    JWT_SECRET=sua_chave_secreta
-    PORT=5000
-    ```
-3.  Instale dependências: `npm install`
-4.  Popule o banco: `npm run seed`
-5.  Inicie: `npm run dev`
-
-### Configuração do Cliente
-1.  Entre na pasta `/client`.
-2.  Instale dependências: `npm install`
-3.  Inicie: `npm run dev`
-
----
-
-## 6. Endpoints da API
+## 4. Estrutura de Rotas (Principais)
 
 | Método | Rota | Descrição | Acesso |
 | :--- | :--- | :--- | :--- |
-| POST | `/api/auth/login` | Autentica usuário e retorna token | Público |
-| GET | `/api/equipments` | Lista todos os equipamentos | Autenticado |
-| GET | `/api/equipments/:id` | Detalhes e histórico de um equipamento | Autenticado |
-| POST | `/api/checklists` | Submete novo checklist diário | Operador/Admin |
-| GET | `/api/stats/dashboard` | Retorna KPIs e alertas | Admin/Manager |
+| POST | `/api/auth/login` | Autenticação | Público |
+| GET | `/api/equipments` | Lista frota | Autenticado |
+| POST | `/api/maintenances` | Registra manutenção | Admin/Manager |
+| POST | `/api/documents` | Upload de documentos | Admin/Manager |
+| GET | `/api/services` | Lista serviços | Admin/Manager |
+| GET | `/api/stats/dashboard` | KPIs e Alertas | Admin/Manager |
 
 ---
 
-## 7. Próximos Passos (Roadmap)
-*   [ ] Integração com AWS S3 para upload real de PDFs de certificados.
-*   [ ] Geração de relatórios em PDF para clientes.
-*   [ ] Implementação de modo offline-first com Service Workers.
-*   [ ] Notificações Push para alertas de manutenção.
+## 5. Guia de Desenvolvimento
+
+### Configuração
+1.  **Variáveis de Ambiente (.env no /server):**
+    *   `MONGODB_URI`: String de conexão MongoDB.
+    *   `JWT_SECRET`: Chave secreta para tokens.
+    *   `PORT`: Porta do servidor (default: 5000).
+
+### Comandos
+*   **Server:** `npm install` -> `npm run seed` -> `npm run dev`
+*   **Client:** `npm install` -> `npm run dev`
+
+---
+
+## 6. Roadmap de Evolução
+1.  **Sincronização Offline:** Implementar `SyncService` para checklists pendentes.
+2.  **Notificações Automáticas:** Integração de `node-cron` com `nodemailer` para alertas proativos.
+3.  **Storage Cloud:** Migração de uploads para AWS S3 (via `multer-s3`).
+4.  **Relatórios PDF:** Geração de relatórios de manutenção e checklists para exportação.

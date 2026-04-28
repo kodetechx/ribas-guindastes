@@ -31,6 +31,7 @@ const EquipmentSchema: Schema = new Schema(
     documents: [{ type: String }],
     lastMaintenance: { type: Date },
     nextMaintenance: { type: Date },
+    imageUrl: { type: String },
   },
   { timestamps: true }
 );

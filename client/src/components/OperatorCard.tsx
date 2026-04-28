@@ -1,14 +1,28 @@
 import React from 'react';
-import { User, Shield, AlertTriangle } from 'lucide-react';
+import { User, AlertTriangle, Trash2, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Operator } from '../services/operatorService';
+import api from '../services/api';
 
 interface Props {
   operator: Operator;
+  onRefresh: () => void;
+  onEdit: (op: Operator) => void;
 }
 
-const OperatorCard: React.FC<Props> = ({ operator }) => {
+const OperatorCard: React.FC<Props> = ({ operator, onRefresh, onEdit }) => {
   const hasExpiredNR = operator.nrs.some(nr => new Date(nr.expiresAt) < new Date());
+
+  const handleDelete = async () => {
+    if (confirm(`Tem certeza que deseja excluir o operador ${operator.name}?`)) {
+      try {
+        await api.delete(`/operators/${operator._id}`);
+        onRefresh();
+      } catch (err) {
+        alert('Erro ao excluir operador');
+      }
+    }
+  };
 
   return (
     <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm hover:border-blue-900/30 transition-all">
@@ -16,11 +30,19 @@ const OperatorCard: React.FC<Props> = ({ operator }) => {
         <div className="p-3 bg-blue-50 border border-blue-100 rounded-sm text-blue-900">
           <User size={24} />
         </div>
-        {hasExpiredNR && (
-          <div className="flex items-center gap-1.5 px-3 py-1 border border-red-200 bg-red-50 text-red-700 rounded-sm text-[10px] font-black uppercase tracking-widest">
-            <AlertTriangle size={12} strokeWidth={3} /> NR Vencida
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+            {hasExpiredNR && (
+              <div className="flex items-center gap-1.5 px-3 py-1 border border-red-200 bg-red-50 text-red-700 rounded-sm text-[10px] font-black uppercase tracking-widest">
+                <AlertTriangle size={12} strokeWidth={3} /> NR Vencida
+              </div>
+            )}
+            <button onClick={() => onEdit(operator)} className="p-1.5 text-gray-400 hover:text-blue-900 transition-colors">
+                <Edit size={16} />
+            </button>
+            <button onClick={handleDelete} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors">
+                <Trash2 size={16} />
+            </button>
+        </div>
       </div>
 
       <Link to={`/operadores/${operator._id}`}>

@@ -48,6 +48,7 @@ const OperatorSchema: Schema = new Schema(
       enum: ['admin', 'manager', 'operator'],
       default: 'operator',
     },
+    avatarUrl: { type: String },
   },
   { timestamps: true }
 );
