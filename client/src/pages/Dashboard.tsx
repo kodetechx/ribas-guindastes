@@ -1,6 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Truck, AlertTriangle, FileWarning, CheckSquare, Clock, User } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import api from '../services/api';
+
+// Dados mock para os gráficos (já que os endpoints de séries temporais serão implementados futuramente)
+const MOCK_UTILIZATION = [
+  { name: 'Ativos', value: 12 },
+  { name: 'Manutenção', value: 3 },
+  { name: 'Bloqueados', value: 2 },
+];
+
+const MOCK_COSTS = [
+  { month: 'Jan', cost: 4500 },
+  { month: 'Fev', cost: 3200 },
+  { month: 'Mar', cost: 5800 },
+  { month: 'Abr', cost: 2100 },
+];
+
+const COLORS = ['#1E3A8A', '#F59E0B', '#EF4444'];
+...
 
 const Dashboard = () => {
   const [stats, setStats] = useState<any>(null);
@@ -155,6 +173,35 @@ const Dashboard = () => {
               <p className="text-gray-400 text-xs font-bold uppercase italic">Aguardando atividades</p>
             </div>
           )}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
+          <h3 className="text-xs font-black mb-6 border-b border-gray-100 pb-4 uppercase tracking-widest text-gray-500">Utilização de Frota</h3>
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={MOCK_UTILIZATION} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                  {MOCK_UTILIZATION.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                </Pie>
+                <Tooltip />
+                <Legend iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
+          <h3 className="text-xs font-black mb-6 border-b border-gray-100 pb-4 uppercase tracking-widest text-gray-500">Custos de Manutenção (R$)</h3>
+          <div className="h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={MOCK_COSTS}>
+                <XAxis dataKey="month" fontSize={10} axisLine={false} tickLine={false} />
+                <YAxis fontSize={10} axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Bar dataKey="cost" fill="#1E3A8A" radius={[2, 2, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>

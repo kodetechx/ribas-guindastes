@@ -7,6 +7,9 @@ import operatorRoutes from './routes/operator.routes';
 import authRoutes from './routes/auth.routes';
 import checklistRoutes from './routes/checklist.routes';
 import statsRoutes from './routes/stats.routes';
+import maintenanceRoutes from './routes/maintenance.routes';
+import documentRoutes from './routes/document.routes';
+import serviceRoutes from './routes/service.routes';
 
 dotenv.config();
 
@@ -26,6 +29,9 @@ app.use('/api/equipments', equipmentRoutes);
 app.use('/api/operators', operatorRoutes);
 app.use('/api/checklists', checklistRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/maintenances', maintenanceRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/services', serviceRoutes);
 
 app.get('/', (req, res) => {
   res.send('RIBAS API is running...');

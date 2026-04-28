@@ -1,81 +1,95 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FileBadge, Download, Calendar, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 const MyDocuments = () => {
   const { user } = useAuth();
+  const [docs, setDocs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for NR certifications - in a real app this would come from API
-  const docs = [
-    { name: 'NR-11 - Transporte e Movimentação', expires: '2026-10-10', status: 'valid' },
-    { name: 'NR-12 - Segurança no Trabalho em Máquinas', expires: '2026-05-15', status: 'warning' },
-    { name: 'NR-35 - Trabalho em Altura', expires: '2024-01-01', status: 'expired' },
-    { name: 'CNH - Categoria E', expires: '2025-12-31', status: 'valid' },
-  ];
+  useEffect(() => {
+    const fetchDocs = async () => {
+      if (!user) return;
+      try {
+        const res = await api.get(`/documents/operator/${user.id}`);
+        setDocs(res.data);
+      } catch (err) {
+        console.error('Erro ao buscar documentos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDocs();
+  }, [user]);
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-          <FileBadge className="text-industrial-yellow" size={32} />
+    <div className="max-w-4xl mx-auto fade-in">
+      <div className="mb-10 border-b border-gray-200 pb-6">
+        <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight flex items-center gap-3">
+          <FileBadge className="text-blue-900" size={28} />
           Meus Documentos
         </h2>
-        <p className="text-gray-400 mt-2">Consulte suas certificações e validades para operação em campo.</p>
+        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Certificações e validades operacionais</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        {docs.map((doc, idx) => (
-          <div key={idx} className="bg-industrial-gray/20 border border-gray-800 rounded-xl p-5 md:p-6 hover:border-industrial-yellow/30 transition-all group">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-lg ${
-                  doc.status === 'valid' ? 'bg-green-500/10 text-green-500' :
-                  doc.status === 'warning' ? 'bg-yellow-500/10 text-yellow-500' :
-                  'bg-red-500/10 text-red-500'
-                }`}>
-                  <FileBadge size={24} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold group-hover:text-industrial-yellow transition-colors">{doc.name}</h3>
-                  <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                    <Calendar size={14} />
-                    <span>Validade: {new Date(doc.expires).toLocaleDateString()}</span>
+      {loading ? (
+        <div className="text-center py-20 text-gray-400 font-bold uppercase text-xs tracking-widest">Carregando documentos...</div>
+      ) : docs.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {docs.map((doc) => (
+            <div key={doc._id} className="bg-white border border-gray-200 rounded-sm p-5 shadow-sm hover:border-blue-900/30 transition-all">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-sm ${
+                    doc.status === 'valid' ? 'bg-green-50 text-green-700' :
+                    doc.status === 'warning' ? 'bg-yellow-50 text-yellow-700' :
+                    'bg-red-50 text-red-700'
+                  }`}>
+                    <FileBadge size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">{doc.name}</h3>
+                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">{doc.type}</p>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
-                <div className="flex items-center gap-2">
-                  {doc.status === 'valid' ? (
-                    <span className="flex items-center gap-1.5 px-3 py-1 bg-green-500/20 text-green-500 rounded-full text-[10px] font-black uppercase tracking-widest">
-                      <CheckCircle size={12} /> Válido
-                    </span>
-                  ) : doc.status === 'warning' ? (
-                    <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-[10px] font-black uppercase tracking-widest">
-                      <AlertTriangle size={12} /> Vencendo
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5 px-3 py-1 bg-red-500/20 text-red-500 rounded-full text-[10px] font-black uppercase tracking-widest">
-                      <AlertTriangle size={12} /> Vencido
-                    </span>
-                  )}
+                <a 
+                  href={api.defaults.baseURL + doc.fileUrl} 
+                  target="_blank" 
+                  className="p-2 bg-gray-50 border border-gray-200 rounded-sm text-gray-500 hover:text-blue-900 transition-all"
+                >
+                  <Download size={16} />
+                </a>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                  <Calendar size={12} />
+                  {doc.expiresAt ? new Date(doc.expiresAt).toLocaleDateString() : 'Sem data'}
                 </div>
-                
-                <button className="p-3 bg-industrial-gray/50 hover:bg-industrial-yellow hover:text-black rounded-lg transition-all">
-                  <Download size={20} />
-                </button>
+                {doc.status === 'valid' ? (
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 rounded-sm text-[9px] font-black uppercase tracking-widest border border-green-100">
+                    <CheckCircle size={10} /> Válido
+                  </span>
+                ) : doc.status === 'warning' ? (
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-50 text-yellow-700 rounded-sm text-[9px] font-black uppercase tracking-widest border border-yellow-100">
+                    <AlertTriangle size={10} /> Vencendo
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-700 rounded-sm text-[9px] font-black uppercase tracking-widest border border-red-100">
+                    <AlertTriangle size={10} /> Vencido
+                  </span>
+                )}
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-10 p-6 bg-industrial-yellow/5 border border-industrial-yellow/20 rounded-xl">
-        <h4 className="font-bold text-industrial-yellow mb-2 uppercase text-xs tracking-widest">Aviso Importante</h4>
-        <p className="text-sm text-gray-400 leading-relaxed">
-          De acordo com as normas de segurança, você não deve operar equipamentos se alguma de suas certificações obrigatórias (NRs) estiver vencida. Em caso de discrepância, procure seu gestor imediatamente.
-        </p>
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-20 border-2 border-dashed border-gray-100 rounded-sm">
+          <p className="text-gray-400 text-xs font-bold uppercase italic">Nenhum documento encontrado.</p>
+        </div>
+      )}
     </div>
   );
 };

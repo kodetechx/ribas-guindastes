@@ -6,6 +6,7 @@ import EquipmentDetail from './pages/EquipmentDetail';
 import OperatorList from './pages/OperatorList';
 import ChecklistExecution from './pages/ChecklistExecution';
 import MyDocuments from './pages/MyDocuments';
+import ServicesList from './pages/ServicesList';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -53,6 +54,14 @@ function App() {
             <ProtectedRoute roles={['admin', 'manager']}>
               <Layout>
                 <OperatorList />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/servicos" element={
+            <ProtectedRoute roles={['admin', 'manager']}>
+              <Layout>
+                <ServicesList />
               </Layout>
             </ProtectedRoute>
           } />

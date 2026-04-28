@@ -1,156 +1,212 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Truck, Calendar, Shield, FileText, Settings, AlertTriangle, ClipboardList, CheckCircle } from 'lucide-react';
+import { Truck, Calendar, Shield, FileText, Settings, AlertTriangle, ClipboardList, CheckCircle, Tool, QrCode } from 'lucide-react';
 import api from '../services/api';
+import MaintenanceForm from '../components/MaintenanceForm';
 
 const EquipmentDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [equipment, setEquipment] = useState<any>(null);
   const [checklists, setChecklists] = useState<any[]>([]);
+  const [maintenances, setMaintenances] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMaintenanceForm, setShowMaintenanceForm] = useState(false);
+
+  const fetchDetails = async () => {
+    try {
+      const [eqRes, checkRes, maintRes] = await Promise.all([
+        api.get(`/equipments/${id}`),
+        api.get(`/checklists/equipment/${id}`),
+        api.get(`/maintenances/equipment/${id}`)
+      ]);
+      setEquipment(eqRes.data);
+      setChecklists(checkRes.data);
+      setMaintenances(maintRes.data);
+    } catch (error) {
+      console.error('Erro ao buscar detalhes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const [eqRes, checkRes] = await Promise.all([
-          api.get(`/equipments/${id}`),
-          api.get(`/checklists/equipment/${id}`)
-        ]);
-        setEquipment(eqRes.data);
-        setChecklists(checkRes.data);
-      } catch (error) {
-        console.error('Erro ao buscar detalhes:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchDetails();
   }, [id]);
 
-  if (loading) return <div className="p-10 text-center">Carregando...</div>;
-  if (!equipment) return <div className="p-10 text-center text-red-500">Equipamento não encontrado</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-sm h-8 w-8 border-t-2 border-b-2 border-blue-900"></div>
+    </div>
+  );
+  
+  if (!equipment) return (
+    <div className="p-10 text-center bg-white border border-red-100 rounded-sm">
+      <p className="text-red-600 font-bold uppercase tracking-widest text-sm">Equipamento não encontrado</p>
+      <Link to="/equipamentos" className="text-blue-900 text-xs font-bold uppercase mt-4 inline-block hover:underline">Voltar para lista</Link>
+    </div>
+  );
 
   const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chl=${window.location.origin}/checklist/${id}&chs=200x200&chld=M|0`;
 
+  const statusStyles: any = {
+    active: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', label: 'Ativo' },
+    maintenance: { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-200', label: 'Manutenção' },
+    blocked: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', label: 'Bloqueado' },
+  };
+
+  const style = statusStyles[equipment.status] || statusStyles.active;
+
   return (
-    <div className="max-w-6xl mx-auto pb-20">
-      <div className="flex items-center gap-4 mb-8">
-        <Link to="/equipamentos" className="text-gray-400 hover:text-white">
-          &larr; Voltar para Lista
-        </Link>
-        <h2 className="text-3xl font-extrabold tracking-tight">Detalhes do Equipamento</h2>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Info */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-industrial-gray/30 border border-gray-800 rounded-xl p-8">
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="w-full md:w-48 h-48 bg-industrial-gray/50 rounded-lg flex items-center justify-center border border-gray-700">
-                <Truck size={64} className="text-gray-600" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-3xl font-black mb-2">{equipment.name}</h3>
-                    <p className="text-xl text-gray-400 font-medium">{equipment.brand} {equipment.model}</p>
-                  </div>
-                  <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${
-                    equipment.status === 'active' ? 'bg-green-500/20 text-green-500' : 
-                    equipment.status === 'maintenance' ? 'bg-yellow-500/20 text-yellow-500' : 
-                    'bg-red-500/20 text-red-500'
-                  }`}>
-                    {equipment.status}
-                  </div>
-                </div>
-
-                <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-6">
-                  <div>
-                    <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mb-1">Ano de Fabricação</p>
-                    <p className="font-mono">{equipment.year}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mb-1">Número de Série</p>
-                    <p className="font-mono">{equipment.serialNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mb-1">Última Manut.</p>
-                    <p className="font-mono">{equipment.lastMaintenance ? new Date(equipment.lastMaintenance).toLocaleDateString() : 'N/D'}</p>
-                  </div>
-                </div>
-              </div>
+    <div className="fade-in max-w-[1400px] mx-auto pb-20">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-gray-200 pb-6">
+        <div className="flex items-center gap-4">
+          <Link to="/equipamentos" className="p-2 bg-white border border-gray-200 rounded-sm text-gray-400 hover:text-blue-900 transition-colors">
+            <svg size={20} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </Link>
+          <div>
+            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">{equipment.name}</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={`px-2 py-0.5 border ${style.border} ${style.bg} ${style.text} rounded-sm text-[9px] font-black uppercase tracking-widest`}>
+                {style.label}
+              </span>
+              <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">S/N: {equipment.serialNumber}</span>
             </div>
-          </div>
-
-          {/* History */}
-          <div className="bg-industrial-gray/30 border border-gray-800 rounded-xl p-6">
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <ClipboardList className="text-industrial-yellow" />
-              Histórico de Checklists
-            </h3>
-            {checklists.length > 0 ? (
-              <div className="space-y-4">
-                {checklists.map((check, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 bg-gray-800/20 rounded-lg border border-gray-800">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-2 rounded-full ${check.isApproved ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                        {check.isApproved ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
-                      </div>
-                      <div>
-                        <p className="font-medium">{new Date(check.date).toLocaleDateString()} - {new Date(check.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                        <p className="text-xs text-gray-500">Operador: {check.operator?.name || 'N/D'}</p>
-                      </div>
-                    </div>
-                    {check.notes && (
-                      <div className="hidden md:block text-sm text-gray-400 max-w-xs truncate">
-                        {check.notes}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center py-10 text-gray-600 italic">Nenhum checklist registrado para este equipamento.</p>
-            )}
           </div>
         </div>
+        <div className="flex gap-3">
+          <Link to={`/checklist/${id}`} className="btn-industrial btn-primary">
+            <ClipboardList size={16} />
+            Realizar Checklist
+          </Link>
+          <button onClick={() => setShowMaintenanceForm(true)} className="btn-industrial btn-secondary">
+            <Tool size={16} />
+            Registrar Manutenção
+          </button>
+        </div>
+      </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Info */}
-        <div className="space-y-8">
-          {/* QR Code */}
-          <div className="bg-industrial-gray/30 border border-gray-800 rounded-xl p-6 text-center">
-            <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest mb-4">QR Code de Operação</p>
-            <div className="bg-white p-4 rounded-lg inline-block mb-4">
-              <img src={qrUrl} alt="QR Code" className="w-40 h-40" />
+        <div className="space-y-6">
+          {/* QR Code Card */}
+          <div className="bg-white border border-gray-200 rounded-sm p-6 text-center shadow-sm">
+            <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-4">Etiqueta de Identificação</p>
+            <div className="bg-gray-50 p-4 border border-gray-100 rounded-sm inline-block mb-4">
+              <img src={qrUrl} alt="QR Code" className="w-32 h-32 mix-blend-multiply" />
             </div>
-            <p className="text-xs text-gray-400 px-4">
-              Afixe este código no equipamento para acesso rápido ao checklist e documentos.
+            <p className="text-[10px] text-gray-500 font-medium px-2 leading-relaxed">
+              Use este código para acesso rápido via dispositivo móvel em campo.
             </p>
-            <button className="mt-6 w-full py-2 bg-gray-800 rounded font-bold text-sm hover:bg-gray-700 transition-colors">
-              Imprimir Etiqueta
+            <button className="mt-6 w-full py-2 bg-gray-50 border border-gray-200 rounded-sm text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-100 transition-colors">
+              Imprimir QR Code
             </button>
           </div>
 
-          {/* Quick Actions */}
-          <div className="bg-industrial-gray/30 border border-gray-800 rounded-xl p-6">
-            <h4 className="font-bold mb-4 uppercase text-xs tracking-widest text-gray-500">Ações Rápidas</h4>
-            <div className="grid grid-cols-1 gap-3">
-              <Link to={`/checklist/${id}`} className="flex items-center gap-3 p-3 bg-industrial-yellow text-black rounded font-bold text-sm hover:bg-yellow-500 transition-colors">
-                <ClipboardList size={18} />
-                Realizar Checklist
-              </Link>
-              <button className="flex items-center gap-3 p-3 bg-gray-800 rounded font-bold text-sm hover:bg-gray-700 transition-colors">
-                <Settings size={18} />
-                Agendar Manutenção
-              </button>
-              <button className="flex items-center gap-3 p-3 bg-gray-800 rounded font-bold text-sm hover:bg-gray-700 transition-colors">
-                <FileText size={18} />
-                Gerenciar Documentos
-              </button>
+          {/* Quick Specs */}
+          <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
+            <h4 className="text-[10px] font-black mb-4 uppercase tracking-widest text-gray-400 border-b border-gray-50 pb-2">Especificações</h4>
+            <div className="space-y-4">
+              <div>
+                <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-1">Marca / Modelo</p>
+                <p className="text-sm font-bold text-gray-800 uppercase">{equipment.brand} {equipment.model}</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-1">Ano</p>
+                <p className="text-sm font-bold text-gray-800">{equipment.year}</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-1">Próxima Manutenção</p>
+                <p className={`text-sm font-bold ${equipment.nextMaintenance && new Date(equipment.nextMaintenance) < new Date() ? 'text-red-600' : 'text-gray-800'}`}>
+                  {equipment.nextMaintenance ? new Date(equipment.nextMaintenance).toLocaleDateString() : 'Não agendada'}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-8">
+          {/* Main Grid for History */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            
+            {/* Checklist History */}
+            <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
+              <h3 className="text-xs font-black mb-6 border-b border-gray-100 pb-4 uppercase tracking-widest text-blue-900 flex items-center gap-2">
+                <ClipboardList size={16} />
+                Histórico de Checklists
+              </h3>
+              {checklists.length > 0 ? (
+                <div className="space-y-3">
+                  {checklists.slice(0, 10).map((check, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-sm">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${check.isApproved ? 'bg-green-500' : 'bg-red-500'}`} />
+                        <div>
+                          <p className="text-xs font-bold text-gray-800">
+                            {new Date(check.date).toLocaleDateString()} - {new Date(check.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          <p className="text-[9px] text-gray-400 font-black uppercase tracking-tighter">Operador: {check.operator?.name || '---'}</p>
+                        </div>
+                      </div>
+                      {!check.isApproved && <AlertTriangle size={14} className="text-red-500" />}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-10 text-center border-2 border-dashed border-gray-50 rounded-sm">
+                  <p className="text-gray-400 text-xs font-bold uppercase italic">Nenhum registro encontrado</p>
+                </div>
+              )}
+            </div>
+
+            {/* Maintenance History */}
+            <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm">
+              <h3 className="text-xs font-black mb-6 border-b border-gray-100 pb-4 uppercase tracking-widest text-blue-900 flex items-center gap-2">
+                <Tool size={16} />
+                Histórico de Manutenção
+              </h3>
+              {maintenances.length > 0 ? (
+                <div className="space-y-3">
+                  {maintenances.map((maint, idx) => (
+                    <div key={idx} className="p-3 bg-gray-50 border border-gray-100 rounded-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-800 text-[8px] font-black uppercase rounded-sm border border-blue-100">
+                          {maint.type === 'preventive' ? 'Preventiva' : maint.type === 'corrective' ? 'Corretiva' : 'Inspeção'}
+                        </span>
+                        <span className="text-[9px] font-mono font-bold text-gray-400">{new Date(maint.date).toLocaleDateString()}</span>
+                      </div>
+                      <p className="text-xs font-bold text-gray-800 mb-1">{maint.description}</p>
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200/50">
+                        <p className="text-[9px] text-gray-400 font-black uppercase tracking-tighter">Resp: {maint.mechanic}</p>
+                        <p className="text-[9px] font-black text-blue-900">R$ {maint.cost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-10 text-center border-2 border-dashed border-gray-50 rounded-sm">
+                  <p className="text-gray-400 text-xs font-bold uppercase italic">Nenhum registro de manutenção</p>
+                </div>
+              )}
+            import MaintenanceForm from '../components/MaintenanceForm';
+            import DocumentManager from '../components/DocumentManager'; // Import adicionado
+
+            const EquipmentDetail = () => {
+            ...
+                      {/* Action Cards / Docs Placeholder */}
+                      <DocumentManager ownerId={id!} category="equipment" />
+                    </div>
+                  </div>
+            ...
+
+      {showMaintenanceForm && (
+        <MaintenanceForm 
+          equipmentId={id!} 
+          onClose={() => setShowMaintenanceForm(false)} 
+          onSuccess={fetchDetails} 
+        />
+      )}
     </div>
   );
 };
