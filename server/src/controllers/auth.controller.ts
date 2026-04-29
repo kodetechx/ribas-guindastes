@@ -46,6 +46,12 @@ export class AuthController {
           name: operator.name,
           email: operator.email,
           role: operator.role,
+          registrationNumber: operator.registrationNumber,
+          cnh: operator.cnh,
+          nrs: operator.nrs,
+          photoUrl: operator.photoUrl,
+          avatarUrl: operator.avatarUrl,
+          createdAt: operator.createdAt,
         },
       });
     } catch (error: any) {
