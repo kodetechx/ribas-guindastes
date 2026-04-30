@@ -12,6 +12,10 @@ export class DocumentService {
     return await repository.create(data);
   }
 
+  async updateDocument(id: string, data: Partial<IDocument>) {
+    return await repository.update(id, data);
+  }
+
   async deleteDocument(id: string) {
     return await repository.delete(id);
   }

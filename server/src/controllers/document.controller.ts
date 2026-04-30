@@ -32,4 +32,22 @@ export class DocumentController {
       res.status(400).json({ message: error.message });
     }
   }
+
+  public async update(req: Request, res: Response): Promise<void> {
+    try {
+      const updated = await service.updateDocument(req.params.id, req.body);
+      res.status(200).json(updated);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  public async delete(req: Request, res: Response): Promise<void> {
+    try {
+      await service.deleteDocument(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }

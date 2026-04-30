@@ -9,6 +9,10 @@ export class DocumentRepository {
     return await Document.create(data);
   }
 
+  async update(id: string, data: Partial<IDocument>) {
+    return await Document.findByIdAndUpdate(id, data, { new: true });
+  }
+
   async delete(id: string) {
     return await Document.findByIdAndDelete(id);
   }
