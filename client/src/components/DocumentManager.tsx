@@ -59,7 +59,7 @@ const DocumentManager: React.FC<Props> = ({ ownerId, category }) => {
               Repositório de Documentação
             </h3>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-industrial-yellow text-[8px] font-technical font-black uppercase tracking-widest bg-white/10 px-1.5 py-0.5">Sincronização_Ativa</span>
+              <span className="text-industrial-yellow text-[10px] font-technical font-black uppercase tracking-widest bg-white/10 px-1.5 py-0.5">Sincronização_Ativa</span>
               <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
             </div>
           </div>
