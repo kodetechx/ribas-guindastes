@@ -178,12 +178,12 @@ const Dashboard = () => {
             {filteredDocs.length > 0 ? (
               <div className="space-y-3">
                 {filteredDocs.map((d: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-sm">
+                  <div key={idx} className={`flex items-center justify-between p-3 border rounded-sm ${d.status === 'expired' ? 'bg-red-50 border-red-100' : 'bg-orange-50 border-orange-100'}`}>
                     <div>
-                      <p className="text-xs font-black text-red-900 uppercase tracking-tight">{d.operatorName}</p>
-                      <p className="text-[9px] text-red-700 font-black uppercase">{d.docType}</p>
+                      <p className={`text-xs font-black uppercase tracking-tight ${d.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>{d.operatorName}</p>
+                      <p className={`text-[9px] font-black uppercase ${d.status === 'expired' ? 'text-red-700' : 'text-orange-700'}`}>{d.docType}</p>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-red-900">
+                    <span className={`text-[10px] font-mono font-bold ${d.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>
                       {formatDateUTC(d.expiresAt)}
                     </span>
                   </div>

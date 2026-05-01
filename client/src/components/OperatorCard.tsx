@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Mail, Shield, Settings, Link as LinkIcon } from 'lucide-react';
+import { User, Mail, Shield, Settings, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -10,6 +10,17 @@ interface OperatorCardProps {
 }
 
 const OperatorCard: React.FC<OperatorCardProps> = ({ operator, onRefresh, onEdit }) => {
+  const handleDelete = async () => {
+    if (window.confirm('Tem certeza que deseja excluir este operador?')) {
+      try {
+        await api.delete(`/operators/${operator._id}`);
+        onRefresh();
+      } catch (err) {
+        alert('Erro ao excluir operador');
+      }
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden group hover:border-blue-900 transition-all duration-300">
       <div className="p-5">
@@ -21,10 +32,6 @@ const OperatorCard: React.FC<OperatorCardProps> = ({ operator, onRefresh, onEdit
                   src={api.defaults.baseURL?.replace('/api', '') + operator.photoUrl} 
                   alt={operator.name} 
                   className="w-full h-full object-cover"
-                  onError={(e: any) => {
-                    e.target.onerror = null;
-                    e.target.parentElement.innerHTML = '<svg size="24" class="text-blue-900"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
-                  }}
                 />
               ) : (
                 <User size={24} className="text-blue-900" />
@@ -35,12 +42,20 @@ const OperatorCard: React.FC<OperatorCardProps> = ({ operator, onRefresh, onEdit
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{operator.role}</p>
             </div>
           </div>
-          <button 
-            onClick={() => onEdit(operator)}
-            className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-sm transition-colors"
-          >
-            <Settings size={16} />
-          </button>
+          <div className="flex gap-1">
+            <button 
+              onClick={() => onEdit(operator)}
+              className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-sm transition-colors"
+            >
+              <Settings size={16} />
+            </button>
+            <button 
+              onClick={handleDelete}
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
 
         <div className="space-y-2 mb-6">

@@ -10,7 +10,11 @@ export class DocumentRepository {
   }
 
   async update(id: string, data: Partial<IDocument>) {
-    return await Document.findByIdAndUpdate(id, data, { new: true });
+    const doc = await Document.findById(id);
+    if (!doc) throw new Error('Documento não encontrado');
+    
+    Object.assign(doc, data);
+    return await doc.save();
   }
 
   async delete(id: string) {

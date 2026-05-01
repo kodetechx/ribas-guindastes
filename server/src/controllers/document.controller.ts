@@ -16,7 +16,11 @@ export class DocumentController {
 
   public upload = async (req: any, res: Response): Promise<void> => {
     try {
-      if (!req.file) throw new Error('Nenhum arquivo enviado');
+      console.log('Recebendo upload de documento:', req.body);
+      if (!req.file) {
+        console.error('Erro: Nenhum arquivo enviado');
+        throw new Error('Nenhum arquivo enviado');
+      }
       
       const docData = {
         ...req.body,
@@ -26,10 +30,15 @@ export class DocumentController {
         size: req.file.size
       };
       
+      console.log('Dados processados para salvamento:', docData);
       const newDoc = await service.uploadDocument(docData);
       res.status(201).json(newDoc);
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      console.error('Erro no upload de documento:', error);
+      res.status(400).json({ 
+        message: error.message,
+        details: error.errors // Inclui erros de validação do Mongoose se houver
+      });
     }
   }
 

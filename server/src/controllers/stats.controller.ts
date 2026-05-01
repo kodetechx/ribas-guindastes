@@ -3,6 +3,7 @@ import Equipment from '../models/Equipment';
 import Operator from '../models/Operator';
 import Checklist from '../models/Checklist';
 import Maintenance from '../models/Maintenance';
+import DocumentModel from '../models/Document';
 
 export class StatsController {
   public async getDashboardStats(req: Request, res: Response): Promise<void> {
@@ -41,20 +42,34 @@ export class StatsController {
         nextMaintenance: { $lte: nextMonthLimit, $gte: now }
       }).select('name nextMaintenance');
 
-      // Expiring Operator Documents (next 30 days)
-      const expiringDocs = await Operator.find({
-        "nrs.expiresAt": { $lte: nextMonthLimit, $gte: now }
+      // 1. Alertas de Operadores (NRs e CNH)
+      const expiringNRs = await Operator.find({
+        "nrs.expiresAt": { $lte: nextMonthLimit }
       }).select('name nrs');
 
-      // Flatten documents into alerts
-      const documentAlerts = expiringDocs.flatMap(op => 
-        op.nrs.filter(nr => nr.expiresAt <= nextMonthLimit && nr.expiresAt >= now)
+      const operatorAlerts = expiringNRs.flatMap(op => 
+        op.nrs.filter(nr => nr.expiresAt <= nextMonthLimit)
           .map(nr => ({
             operatorName: op.name,
             docType: nr.type,
-            expiresAt: nr.expiresAt
+            expiresAt: nr.expiresAt,
+            status: nr.expiresAt < now ? 'expired' : 'warning'
           }))
       );
+
+      // 2. Alertas de Documentos Gerais (Document Model)
+      const expiringGeneralDocs = await DocumentModel.find({
+        expiresAt: { $lte: nextMonthLimit }
+      }).populate('ownerId', 'name');
+
+      const generalAlerts = expiringGeneralDocs.map(doc => ({
+        operatorName: (doc.ownerId as any)?.name || 'N/A',
+        docType: doc.name,
+        expiresAt: doc.expiresAt,
+        status: doc.status
+      }));
+
+      const documentAlerts = [...operatorAlerts, ...generalAlerts];
 
       // 1. Frota Utilização
       const utilization = [

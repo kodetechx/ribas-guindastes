@@ -1,5 +1,5 @@
 import React from 'react';
-import { Truck, MapPin, Calendar, Clock, Edit, Settings } from 'lucide-react';
+import { Truck, MapPin, Calendar, Clock, Edit, Settings, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -18,6 +18,17 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onRefresh, onE
 
   const style = statusStyles[equipment.status] || statusStyles.active;
 
+  const handleDelete = async () => {
+    if (window.confirm('Tem certeza que deseja excluir este equipamento?')) {
+      try {
+        await api.delete(`/equipments/${equipment._id}`);
+        onRefresh();
+      } catch (err) {
+        alert('Erro ao excluir equipamento');
+      }
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden group hover:border-blue-900 transition-all duration-300">
       <div className="p-5">
@@ -29,11 +40,6 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onRefresh, onE
                   src={api.defaults.baseURL?.replace('/api', '') + equipment.imageUrl} 
                   alt={equipment.name} 
                   className="w-full h-full object-cover"
-                  onError={(e: any) => {
-                    e.target.onerror = null;
-                    e.target.src = ''; // Fallback se a imagem falhar
-                    e.target.parentElement.innerHTML = '<svg size="24" class="text-blue-900"><path d="M10 17h4V5H2v12h3m5 0h20m-2 0v-4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4m10 0v-4"></path></svg>';
-                  }}
                 />
               ) : (
                 <Truck size={24} className="text-blue-900" />
@@ -44,12 +50,20 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onRefresh, onE
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{equipment.brand} • {equipment.model}</p>
             </div>
           </div>
-          <button 
-            onClick={() => onEdit(equipment)}
-            className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-sm transition-colors"
-          >
-            <Settings size={16} />
-          </button>
+          <div className="flex gap-1">
+            <button 
+              onClick={() => onEdit(equipment)}
+              className="p-2 text-gray-400 hover:text-blue-900 hover:bg-blue-50 rounded-sm transition-colors"
+            >
+              <Settings size={16} />
+            </button>
+            <button 
+              onClick={handleDelete}
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 mb-6">

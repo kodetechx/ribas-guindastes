@@ -36,7 +36,7 @@ const DocumentSchema: Schema = new Schema(
 );
 
 // Middleware para atualizar status baseado na data de validade antes de salvar
-DocumentSchema.pre<IDocument>('save', function (next) {
+DocumentSchema.pre<IDocument>('save', async function () {
   if (this.expiresAt) {
     const now = new Date();
     const thirtyDaysFromNow = new Date();
@@ -50,7 +50,6 @@ DocumentSchema.pre<IDocument>('save', function (next) {
       this.status = 'valid';
     }
   }
-  next();
 });
 
 export default mongoose.model<IDocument>('Document', DocumentSchema);
