@@ -1,8 +1,9 @@
 import { MaintenanceRepository } from '../repositories/maintenance.repository';
+import { EquipmentRepository } from '../repositories/equipment.repository';
 import { IMaintenance } from '../models/Maintenance';
-import Equipment from '../models/Equipment';
 
 const repository = new MaintenanceRepository();
+const equipmentRepository = new EquipmentRepository();
 
 export class MaintenanceService {
   async getAllMaintenances() {
@@ -22,14 +23,26 @@ export class MaintenanceService {
   }
 
   async createMaintenance(data: Partial<IMaintenance>) {
+    // Normalizar datas para evitar shift de fuso horário (meio-dia UTC)
+    if (data.date) {
+      const d = new Date(data.date);
+      data.date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12, 0, 0));
+    }
+    if (data.nextMaintenanceDate) {
+      const d = new Date(data.nextMaintenanceDate);
+      data.nextMaintenanceDate = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12, 0, 0));
+    }
+    
+    if (data.cost) data.cost = Number(data.cost);
+
     const maintenance = await repository.create(data);
 
-    // Atualizar o equipamento relacionado
+    // Atualizar o equipamento relacionado usando o repositório
     if (maintenance.equipment) {
-      await Equipment.findByIdAndUpdate(maintenance.equipment, {
+      await equipmentRepository.update(maintenance.equipment.toString(), {
         lastMaintenance: maintenance.date,
         nextMaintenance: maintenance.nextMaintenanceDate,
-        status: 'active' // Assume que após manutenção o equipamento volta a ficar ativo
+        status: 'active' 
       });
     }
 

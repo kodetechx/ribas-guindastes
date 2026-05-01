@@ -26,6 +26,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Request Logger
 app.use((req, res, next) => {
@@ -42,6 +43,14 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/maintenances', maintenanceRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/services', serviceRoutes);
+
+// Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  const status = err.status || 500;
+  const message = err.message || 'Internal Server Error';
+  res.status(status).json({ message });
+});
 
 app.get('/', (req, res) => {
   res.send('RIBAS API is running...');

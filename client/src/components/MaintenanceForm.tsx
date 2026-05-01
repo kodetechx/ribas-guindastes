@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Save, Calendar, Wrench } from 'lucide-react';
 import api from '../services/api';
 
 interface MaintenanceFormProps {
   equipmentId: string;
+  initialData?: any;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const MaintenanceForm: React.FC<MaintenanceFormProps> = ({ equipmentId, onClose, onSuccess }) => {
+const MaintenanceForm: React.FC<MaintenanceFormProps> = ({ equipmentId, initialData, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     type: 'preventive',
@@ -20,16 +21,36 @@ const MaintenanceForm: React.FC<MaintenanceFormProps> = ({ equipmentId, onClose,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        date: initialData.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        type: initialData.type || 'preventive',
+        description: initialData.description || '',
+        cost: initialData.cost || 0,
+        mechanic: initialData.mechanic || '',
+        nextMaintenanceDate: initialData.nextMaintenanceDate ? new Date(initialData.nextMaintenanceDate).toISOString().split('T')[0] : '',
+      });
+    }
+  }, [initialData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      await api.post('/maintenances', {
-        ...formData,
-        equipment: equipmentId,
-      });
+      if (initialData) {
+        await api.put(`/maintenances/${initialData._id}`, {
+          ...formData,
+          equipment: equipmentId,
+        });
+      } else {
+        await api.post('/maintenances', {
+          ...formData,
+          equipment: equipmentId,
+        });
+      }
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -45,7 +66,7 @@ const MaintenanceForm: React.FC<MaintenanceFormProps> = ({ equipmentId, onClose,
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h3 className="text-lg font-black uppercase tracking-tight text-blue-900 flex items-center gap-2">
             <Wrench size={20} />
-            Registrar Manutenção
+            {initialData ? 'Editar Manutenção' : 'Registrar Manutenção'}
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={24} />

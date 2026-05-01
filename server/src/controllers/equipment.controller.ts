@@ -24,7 +24,11 @@ export class EquipmentController {
 
   async create(req: Request, res: Response) {
     try {
-      const equipment = await service.createEquipment(req.body);
+      const data = { ...req.body };
+      if (req.file) {
+        data.imageUrl = `/uploads/${req.file.filename}`;
+      }
+      const equipment = await service.createEquipment(data);
       res.status(201).json(equipment);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
@@ -33,7 +37,11 @@ export class EquipmentController {
 
   async update(req: Request, res: Response) {
     try {
-      const equipment = await service.updateEquipment(req.params.id, req.body);
+      const data = { ...req.body };
+      if (req.file) {
+        data.imageUrl = `/uploads/${req.file.filename}`;
+      }
+      const equipment = await service.updateEquipment(req.params.id, data);
       res.json(equipment);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });

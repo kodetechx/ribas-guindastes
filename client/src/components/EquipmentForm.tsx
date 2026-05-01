@@ -20,12 +20,20 @@ const EquipmentForm: React.FC<Props> = ({ initialData, onClose, onSuccess }) => 
     e.preventDefault();
     setLoading(true);
     const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value as any));
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        data.append(key, value as any);
+      }
+    });
     if (image) data.append('file', image);
 
     try {
-      if (initialData) await api.put(`/equipments/${initialData._id}`, formData);
-      else await api.post('/equipments', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+      if (initialData) {
+        await api.put(`/equipments/${initialData._id}`, data, config);
+      } else {
+        await api.post('/equipments', data, config);
+      }
       onSuccess();
       onClose();
     } catch (err) {

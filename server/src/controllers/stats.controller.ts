@@ -30,29 +30,60 @@ export class StatsController {
         .populate('equipment', 'name')
         .populate('operator', 'name');
 
-      // Upcoming maintenances (next 7 days)
-      const nextWeek = new Date();
-      nextWeek.setDate(nextWeek.getDate() + 7);
+      // Upcoming maintenances (next 30 days)
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const nextMonthLimit = new Date();
+      nextMonthLimit.setDate(nextMonthLimit.getDate() + 30);
+      nextMonthLimit.setHours(23, 59, 59, 999);
+      
       const upcomingMaintenances = await Equipment.find({
-        nextMaintenance: { $lte: nextWeek, $gte: new Date() }
+        nextMaintenance: { $lte: nextMonthLimit, $gte: now }
       }).select('name nextMaintenance');
 
       // Expiring Operator Documents (next 30 days)
-      const nextMonth = new Date();
-      nextMonth.setDate(nextMonth.getDate() + 30);
       const expiringDocs = await Operator.find({
-        "nrs.expiresAt": { $lte: nextMonth, $gte: new Date() }
+        "nrs.expiresAt": { $lte: nextMonthLimit, $gte: now }
       }).select('name nrs');
 
       // Flatten documents into alerts
       const documentAlerts = expiringDocs.flatMap(op => 
-        op.nrs.filter(nr => nr.expiresAt <= nextMonth && nr.expiresAt >= new Date())
+        op.nrs.filter(nr => nr.expiresAt <= nextMonthLimit && nr.expiresAt >= now)
           .map(nr => ({
             operatorName: op.name,
             docType: nr.type,
             expiresAt: nr.expiresAt
           }))
       );
+
+      // 1. Frota Utilização
+      const utilization = [
+        { name: 'Ativos', value: activeEquipments },
+        { name: 'Manutenção', value: maintenanceEquipments },
+        { name: 'Bloqueados', value: blockedEquipments },
+      ];
+
+      // 2. Custos de Manutenção (últimos 4 meses completos)
+      const months = [];
+      for (let i = 3; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const firstDay = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
+        const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
+        months.push({
+          month: d.toLocaleString('pt-BR', { month: 'short' }).toUpperCase(),
+          start: firstDay,
+          end: lastDay
+        });
+      }
+
+      const costs = await Promise.all(months.map(async (m) => {
+        const maintenances = await Maintenance.find({
+          date: { $gte: m.start, $lte: m.end }
+        });
+        const totalCost = maintenances.reduce((acc, curr) => acc + (Number(curr.cost) || 0), 0);
+        return { month: m.month, cost: totalCost };
+      }));
 
       res.status(200).json({
         equipments: {
@@ -71,6 +102,10 @@ export class StatsController {
         alerts: {
           upcomingMaintenances,
           documentAlerts
+        },
+        charts: {
+          utilization,
+          costs
         }
       });
     } catch (error: any) {

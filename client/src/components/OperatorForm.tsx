@@ -20,12 +20,20 @@ const OperatorForm: React.FC<Props> = ({ initialData, onClose, onSuccess }) => {
     e.preventDefault();
     setLoading(true);
     const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value as any));
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        data.append(key, value as any);
+      }
+    });
     if (avatar) data.append('file', avatar);
 
     try {
-      if (initialData) await api.put(`/operators/${initialData._id}`, formData);
-      else await api.post('/operators', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+      if (initialData) {
+        await api.put(`/operators/${initialData._id}`, data, config);
+      } else {
+        await api.post('/operators', data, config);
+      }
       onSuccess();
       onClose();
     } catch (err) {

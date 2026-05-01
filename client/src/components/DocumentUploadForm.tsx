@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Save, FileText, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, FileText, Calendar, Upload } from 'lucide-react';
 import api from '../services/api';
 
 interface Props {
@@ -27,10 +27,8 @@ const DocumentUploadForm: React.FC<Props> = ({ initialData, ownerId, category, o
 
     try {
       if (initialData) {
-        // Edit mode (only metadata, changing file would be a new upload usually)
         await api.put(`/documents/${initialData._id}`, formData);
       } else {
-        // Create mode
         if (!file) {
           setError('POR_FAVOR_SELECIONE_UM_ARQUIVO');
           setLoading(false);
@@ -157,7 +155,7 @@ const DocumentUploadForm: React.FC<Props> = ({ initialData, ownerId, category, o
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-4 bg-industrial-dark text-white font-black uppercase text-[10px] tracking-[0.2em] hover:bg-industrial-yellow hover:text-black transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-none disabled:opacity-50"
+              className="flex-1 py-4 bg-gray-900 text-white font-black uppercase text-[10px] tracking-[0.2em] hover:bg-yellow-500 hover:text-black transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,0.1)] hover:shadow-none disabled:opacity-50"
             >
               {loading ? 'PROCESSANDO...' : 'EXECUTAR_REGISTRO'}
             </button>
@@ -167,9 +165,5 @@ const DocumentUploadForm: React.FC<Props> = ({ initialData, ownerId, category, o
     </div>
   );
 };
-
-const Upload = ({ size, className }: { size: number, className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-);
 
 export default DocumentUploadForm;

@@ -4,7 +4,7 @@ import { DocumentService } from '../services/document.service';
 const service = new DocumentService();
 
 export class DocumentController {
-  public async getByOwner(req: Request, res: Response): Promise<void> {
+  public getByOwner = async (req: Request, res: Response): Promise<void> => {
     try {
       const { ownerId, category } = req.params;
       const documents = await service.getDocumentsByOwner(ownerId, category as any);
@@ -14,7 +14,7 @@ export class DocumentController {
     }
   }
 
-  public async upload(req: any, res: Response): Promise<void> {
+  public upload = async (req: any, res: Response): Promise<void> => {
     try {
       if (!req.file) throw new Error('Nenhum arquivo enviado');
       
@@ -33,7 +33,7 @@ export class DocumentController {
     }
   }
 
-  public async update(req: Request, res: Response): Promise<void> {
+  public update = async (req: Request, res: Response): Promise<void> => {
     try {
       const updated = await service.updateDocument(req.params.id, req.body);
       res.status(200).json(updated);
@@ -42,7 +42,7 @@ export class DocumentController {
     }
   }
 
-  public async delete(req: Request, res: Response): Promise<void> {
+  public delete = async (req: Request, res: Response): Promise<void> => {
     try {
       await service.deleteDocument(req.params.id);
       res.status(204).send();

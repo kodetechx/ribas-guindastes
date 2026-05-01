@@ -28,7 +28,7 @@ const OperatorSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: false }, // Opcional por enquanto
+    password: { type: String, required: true },
     registrationNumber: { type: String, required: true, unique: true },
     cnh: {
       number: { type: String, required: true },

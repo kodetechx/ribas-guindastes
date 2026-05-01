@@ -3,23 +3,25 @@ import { useParams, Link } from 'react-router-dom';
 import { User, Shield, AlertTriangle, FileBadge, Calendar } from 'lucide-react';
 import api from '../services/api';
 import DocumentManager from '../components/DocumentManager';
+import { formatDateUTC } from '../utils/dateUtils';
 
 const OperatorDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [operator, setOperator] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchOperator = async () => {
+    try {
+      const res = await api.get(`/operators/${id}`);
+      setOperator(res.data);
+    } catch (err) {
+      console.error('Erro ao buscar operador');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOperator = async () => {
-      try {
-        const res = await api.get(`/operators/${id}`);
-        setOperator(res.data);
-      } catch (err) {
-        console.error('Erro ao buscar operador');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOperator();
   }, [id]);
 
@@ -52,7 +54,7 @@ const OperatorDetail = () => {
             </div>
           </div>
 
-          <DocumentManager ownerId={id!} category="operator" />
+          <DocumentManager ownerId={id!} category="operator" onUploadSuccess={fetchOperator} />
         </div>
 
         <div className="space-y-6">
@@ -65,7 +67,7 @@ const OperatorDetail = () => {
                     <Shield size={16} className={new Date(nr.expiresAt) < new Date() ? 'text-red-700' : 'text-blue-900'} />
                     <span className="text-xs font-black uppercase text-gray-700">{nr.type}</span>
                   </div>
-                  <span className="text-[10px] font-mono font-bold text-gray-400">{new Date(nr.expiresAt).toLocaleDateString()}</span>
+                  <span className="text-[10px] font-mono font-bold text-gray-400">{formatDateUTC(nr.expiresAt)}</span>
                 </div>
               ))}
             </div>

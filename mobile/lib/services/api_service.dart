@@ -5,8 +5,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:5000/api'; // Firefox / Web
-  // static const String baseUrl = 'http://10.0.2.2:5000/api'; // Android Emulator
+  // Use 10.0.2.2 for Android Emulator, localhost for iOS/Web
+  static const String defaultBaseUrl = 'http://10.0.2.2:5000/api';
+  final String baseUrl;
+  
+  ApiService({this.baseUrl = defaultBaseUrl});
   
   final _storage = const FlutterSecureStorage();
 

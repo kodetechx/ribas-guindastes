@@ -6,9 +6,10 @@ import DocumentUploadForm from './DocumentUploadForm';
 interface Props {
   ownerId: string;
   category: 'operator' | 'equipment';
+  onUploadSuccess?: () => void;
 }
 
-const DocumentManager: React.FC<Props> = ({ ownerId, category }) => {
+const DocumentManager: React.FC<Props> = ({ ownerId, category, onUploadSuccess }) => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -19,6 +20,7 @@ const DocumentManager: React.FC<Props> = ({ ownerId, category }) => {
       setLoading(true);
       const res = await api.get(`/documents/${category}/${ownerId}`);
       setDocuments(res.data);
+      if (onUploadSuccess) onUploadSuccess();
     } catch (err) {
       console.error('ERRO_AO_BUSCAR_DOCUMENTOS');
     } finally {

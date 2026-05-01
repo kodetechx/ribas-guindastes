@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Maintenance, { IMaintenance } from '../models/Maintenance';
 
 export class MaintenanceRepository {
@@ -10,7 +11,9 @@ export class MaintenanceRepository {
   }
 
   async findByEquipment(equipmentId: string) {
-    return await Maintenance.find({ equipment: equipmentId }).sort({ date: -1 });
+    return await Maintenance.find({ 
+      equipment: new mongoose.Types.ObjectId(equipmentId) 
+    }).sort({ date: -1 });
   }
 
   async create(data: Partial<IMaintenance>) {
