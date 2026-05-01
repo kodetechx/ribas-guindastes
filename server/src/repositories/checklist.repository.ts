@@ -17,6 +17,14 @@ export class ChecklistRepository {
     return await Checklist.create(data);
   }
 
+  async update(id: string, data: Partial<IChecklist>) {
+    return await Checklist.findByIdAndUpdate(id, data, { new: true });
+  }
+
+  async delete(id: string) {
+    return await Checklist.findByIdAndDelete(id);
+  }
+
   async findTodayByEquipment(equipmentId: string) {
     const start = new Date();
     start.setHours(0, 0, 0, 0);

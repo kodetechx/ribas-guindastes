@@ -54,8 +54,19 @@ export class ChecklistService {
     return await repository.findByEquipment(equipmentId);
   }
 
-  async checkToday(equipmentId: string) {
-    const todayChecklist = await repository.findTodayByEquipment(equipmentId);
-    return !!todayChecklist;
+  async updateChecklist(id: string, data: Partial<IChecklist>) {
+    const updated = await repository.update(id, data);
+    if (!updated) {
+      throw new Error('Checklist não encontrado');
+    }
+    return updated;
+  }
+
+  async deleteChecklist(id: string) {
+    const deleted = await repository.delete(id);
+    if (!deleted) {
+      throw new Error('Checklist não encontrado');
+    }
+    return deleted;
   }
 }

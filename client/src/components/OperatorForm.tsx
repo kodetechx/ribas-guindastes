@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, UserPlus } from 'lucide-react';
 import api from '../services/api';
 import ImageUploader from './ImageUploader';
+import { useAuth } from '../context/AuthContext';
 
 interface Props {
   initialData?: any;
@@ -10,8 +11,12 @@ interface Props {
 }
 
 const OperatorForm: React.FC<Props> = ({ initialData, onClose, onSuccess }) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
   const [formData, setFormData] = useState(initialData || {
-    name: '', email: '', registrationNumber: '', role: 'operator'
+    name: '', email: '', registrationNumber: '', role: 'operator', password: '',
+    cnh: { number: '', category: '', expiresAt: '' }
   });
   const [avatar, setAvatar] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,7 +26,11 @@ const OperatorForm: React.FC<Props> = ({ initialData, onClose, onSuccess }) => {
     setLoading(true);
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (typeof value === 'object' && value !== null) {
+        Object.entries(value as any).forEach(([subKey, subValue]) => {
+          data.append(`${key}[${subKey}]`, subValue as any);
+        });
+      } else if (value !== undefined && value !== null) {
         data.append(key, value as any);
       }
     });
@@ -56,7 +65,25 @@ const OperatorForm: React.FC<Props> = ({ initialData, onClose, onSuccess }) => {
           <ImageUploader onImageChange={setAvatar} currentImage={initialData?.avatarUrl} />
           <input type="text" placeholder="Nome Completo" className="w-full border p-2 text-sm" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
           <input type="email" placeholder="E-mail" className="w-full border p-2 text-sm" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+          
+          {isAdmin && (
+            <input 
+              type="password" 
+              placeholder="Senha de Login" 
+              className="w-full border p-2 text-sm" 
+              onChange={(e) => setFormData({...formData, password: e.target.value})} 
+              required={!initialData} 
+            />
+          )}
+
           <input type="text" placeholder="Matrícula" className="w-full border p-2 text-sm" value={formData.registrationNumber} onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})} required />
+          
+          <div className="grid grid-cols-2 gap-2">
+            <input type="text" placeholder="CNH Número" className="w-full border p-2 text-sm" value={formData.cnh.number} onChange={(e) => setFormData({...formData, cnh: {...formData.cnh, number: e.target.value}})} required />
+            <input type="text" placeholder="Cat. CNH" className="w-full border p-2 text-sm" value={formData.cnh.category} onChange={(e) => setFormData({...formData, cnh: {...formData.cnh, category: e.target.value}})} required />
+          </div>
+          <input type="date" className="w-full border p-2 text-sm" value={formData.cnh.expiresAt ? formData.cnh.expiresAt.toString().split('T')[0] : ''} onChange={(e) => setFormData({...formData, cnh: {...formData.cnh, expiresAt: e.target.value}})} required />
+
           <select className="w-full border p-2 text-sm" value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})}>
             <option value="operator">Operador</option>
             <option value="manager">Gestor</option>

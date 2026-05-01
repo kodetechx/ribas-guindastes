@@ -4,7 +4,7 @@ import { ChecklistService } from '../services/checklist.service';
 const service = new ChecklistService();
 
 export class ChecklistController {
-  public async getAll(req: Request, res: Response): Promise<void> {
+  public getAll = async (req: Request, res: Response): Promise<void> => {
     try {
       const checklists = await service.getAllChecklists();
       res.status(200).json(checklists);
@@ -13,7 +13,7 @@ export class ChecklistController {
     }
   }
 
-  public async getById(req: Request, res: Response): Promise<void> {
+  public getById = async (req: Request, res: Response): Promise<void> => {
     try {
       const checklist = await service.getChecklistById(req.params.id);
       res.status(200).json(checklist);
@@ -22,7 +22,7 @@ export class ChecklistController {
     }
   }
 
-  public async create(req: any, res: Response): Promise<void> {
+  public create = async (req: any, res: Response): Promise<void> => {
     try {
       // Auto-assign operator from token if not provided
       const checklistData = {
@@ -36,7 +36,7 @@ export class ChecklistController {
     }
   }
 
-  public async getByEquipment(req: Request, res: Response): Promise<void> {
+  public getByEquipment = async (req: Request, res: Response): Promise<void> => {
     try {
       const checklists = await service.getByEquipment(req.params.equipmentId);
       res.status(200).json(checklists);
@@ -44,13 +44,31 @@ export class ChecklistController {
       res.status(500).json({ message: error.message });
     }
   }
-
-  public async checkToday(req: Request, res: Response): Promise<void> {
+  
+  public checkToday = async (req: Request, res: Response): Promise<void> => {
     try {
       const exists = await service.checkToday(req.params.equipmentId);
       res.status(200).json({ hasChecklist: exists });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  }
+
+  public update = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const updated = await service.updateChecklist(req.params.id, req.body);
+      res.status(200).json(updated);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  public delete = async (req: Request, res: Response): Promise<void> => {
+    try {
+      await service.deleteChecklist(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   }
 }

@@ -24,14 +24,12 @@ export class StatsController {
         date: { $gte: start, $lte: end }
       });
 
-      // Recent checklists
       const recentChecklists = await Checklist.find()
         .sort({ createdAt: -1 })
         .limit(5)
         .populate('equipment', 'name')
         .populate('operator', 'name');
 
-      // Upcoming maintenances (next 30 days)
       const now = new Date();
       now.setHours(0,0,0,0);
       const nextMonthLimit = new Date();
@@ -42,7 +40,7 @@ export class StatsController {
         nextMaintenance: { $lte: nextMonthLimit, $gte: now }
       }).select('name nextMaintenance');
 
-      // 1. Alertas de Operadores (NRs e CNH)
+      // 1. Alertas de Operadores (NRs)
       const expiringNRs = await Operator.find({
         "nrs.expiresAt": { $lte: nextMonthLimit }
       }).select('name nrs');
@@ -57,7 +55,7 @@ export class StatsController {
           }))
       );
 
-      // 2. Alertas de Documentos Gerais (Document Model)
+      // 2. Alertas de Documentos Gerais
       const expiringGeneralDocs = await DocumentModel.find({
         expiresAt: { $lte: nextMonthLimit }
       }).populate('ownerId', 'name');
@@ -71,14 +69,14 @@ export class StatsController {
 
       const documentAlerts = [...operatorAlerts, ...generalAlerts];
 
-      // 1. Frota Utilização
+      // Frota Utilização
       const utilization = [
         { name: 'Ativos', value: activeEquipments },
         { name: 'Manutenção', value: maintenanceEquipments },
         { name: 'Bloqueados', value: blockedEquipments },
       ];
 
-      // 2. Custos de Manutenção (últimos 4 meses completos)
+      // Custos de Manutenção
       const months = [];
       for (let i = 3; i >= 0; i--) {
         const d = new Date();
@@ -101,27 +99,11 @@ export class StatsController {
       }));
 
       res.status(200).json({
-        equipments: {
-          total: totalEquipments,
-          active: activeEquipments,
-          maintenance: maintenanceEquipments,
-          blocked: blockedEquipments
-        },
-        operators: {
-          total: totalOperators
-        },
-        checklists: {
-          today: checklistsToday,
-          recent: recentChecklists
-        },
-        alerts: {
-          upcomingMaintenances,
-          documentAlerts
-        },
-        charts: {
-          utilization,
-          costs
-        }
+        equipments: { total: totalEquipments, active: activeEquipments, maintenance: maintenanceEquipments, blocked: blockedEquipments },
+        operators: { total: totalOperators },
+        checklists: { today: checklistsToday, recent: recentChecklists },
+        alerts: { upcomingMaintenances, documentAlerts },
+        charts: { utilization, costs }
       });
     } catch (error: any) {
       res.status(500).json({ message: error.message });

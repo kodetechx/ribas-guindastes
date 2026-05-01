@@ -60,9 +60,25 @@ const EquipmentDetail = () => {
     }
   };
 
+  const handleDeleteChecklist = async (checkId: string) => {
+    if (window.confirm('Tem certeza que deseja excluir este checklist?')) {
+      try {
+        await api.delete(`/checklists/${checkId}`);
+        fetchDetails();
+      } catch (error) {
+        alert('Erro ao excluir checklist');
+      }
+    }
+  };
+
   const handleEditMaintenance = (maint: any) => {
     setEditingMaintenance(maint);
     setShowMaintenanceForm(true);
+  };
+  
+  const handleEditChecklist = (check: any) => {
+    // Redireciona para tela de execução com ID do checklist para carregar dados
+    window.location.href = `/checklist/${id}?edit=${check._id}`;
   };
 
   if (loading) return (
@@ -197,7 +213,7 @@ const EquipmentDetail = () => {
                 {checklists.length > 0 ? (
                   <div className="space-y-3">
                     {checklists.map((check, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-sm">
+                      <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-sm group">
                         <div className="flex items-center gap-3">
                           <div className={`w-2 h-2 rounded-full ${check.isApproved ? 'bg-green-500' : 'bg-red-500'}`} />
                           <div>
@@ -207,7 +223,23 @@ const EquipmentDetail = () => {
                             <p className="text-[9px] text-gray-400 font-black uppercase tracking-tighter">Operador: {check.operator?.name || '---'}</p>
                           </div>
                         </div>
-                        {!check.isApproved && <AlertTriangle size={14} className="text-red-500" />}
+                        <div className="flex items-center gap-2">
+                          {!check.isApproved && <AlertTriangle size={14} className="text-red-500" />}
+                          <div className="hidden group-hover:flex items-center gap-1">
+                            <button 
+                              onClick={() => handleEditChecklist(check)}
+                              className="p-1 text-blue-600 hover:bg-blue-100 rounded-sm transition-colors"
+                            >
+                              <Edit size={12} />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteChecklist(check._id)}
+                              className="p-1 text-red-600 hover:bg-red-100 rounded-sm transition-colors"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
