@@ -1,15 +1,24 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ApiService {
-  // Use 10.0.2.2 for Android Emulator, localhost for iOS/Web
-  static const String defaultBaseUrl = 'http://10.0.2.2:5000/api';
+  static String get defaultBaseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:5000/api';
+    }
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:5000/api';
+    }
+    return 'http://localhost:5000/api';
+  }
+
   final String baseUrl;
   
-  ApiService({this.baseUrl = defaultBaseUrl});
+  ApiService({String? baseUrl}) : baseUrl = baseUrl ?? defaultBaseUrl;
   
   final _storage = const FlutterSecureStorage();
 
