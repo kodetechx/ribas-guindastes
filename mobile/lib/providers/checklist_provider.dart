@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
@@ -18,7 +19,7 @@ class ChecklistProvider with ChangeNotifier {
       notifyListeners();
       return response.statusCode == 201 || response.statusCode == 200;
     } catch (e) {
-      print('Submit checklist error: $e');
+      debugPrint('Submit checklist error: $e');
     }
 
     _isLoading = false;
@@ -34,7 +35,7 @@ class ChecklistProvider with ChangeNotifier {
         return data['exists'] ?? false;
       }
     } catch (e) {
-      print('Check today error: $e');
+      debugPrint('Check today error: $e');
     }
     return false;
   }

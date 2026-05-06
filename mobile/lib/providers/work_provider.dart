@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/service.dart';
@@ -51,7 +52,7 @@ class WorkProvider with ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print('Start work error: $e');
+      debugPrint('Start work error: $e');
     }
 
     _isLoading = false;
@@ -76,7 +77,7 @@ class WorkProvider with ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print('Finish work error: $e');
+      debugPrint('Finish work error: $e');
     }
 
     _isLoading = false;

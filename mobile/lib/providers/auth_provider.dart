@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -17,7 +18,7 @@ class AuthProvider with ChangeNotifier {
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
-    print('Tentando login para: $email');
+    debugPrint('Tentando login para: $email');
 
     try {
       final response = await _apiService.post('/auth/login', {
@@ -25,21 +26,21 @@ class AuthProvider with ChangeNotifier {
         'password': password,
       });
 
-      print('Resposta do login: ${response.statusCode}');
+      debugPrint('Resposta do login: ${response.statusCode}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('Login bem-sucedido, salvando token...');
+        debugPrint('Login bem-sucedido, salvando token...');
         await _storage.write(key: 'jwt_token', value: data['token']);
         _user = Operator.fromJson(data['user']);
-        print('Usuário carregado: ${_user?.name}');
+        debugPrint('Usuário carregado: ${_user?.name}');
         _isLoading = false;
         notifyListeners();
         return true;
       } else {
-        print('Erro no login: ${response.body}');
+        debugPrint('Erro no login: ${response.body}');
       }
     } catch (e) {
-      print('Erro de exceção no login: $e');
+      debugPrint('Erro de exceção no login: $e');
     }
 
     _isLoading = false;
@@ -65,7 +66,7 @@ class AuthProvider with ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print('Auto login error: $e');
+      debugPrint('Auto login error: $e');
     }
 
     return false;

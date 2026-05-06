@@ -1,3 +1,4 @@
+import "package:flutter/foundation.dart";
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/equipment.dart';
@@ -22,7 +23,7 @@ class EquipmentProvider with ChangeNotifier {
         _equipments = data.map((item) => Equipment.fromJson(item)).toList();
       }
     } catch (e) {
-      print('Fetch equipments error: $e');
+      debugPrint('Fetch equipments error: $e');
     }
 
     _isLoading = false;

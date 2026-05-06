@@ -52,32 +52,12 @@ class HomeTab extends StatelessWidget {
                 ),
                 _buildQuickAction(
                   context,
-                  'Meus Documentos',
-                  Icons.description,
-                  Colors.orange.shade100,
-                  Colors.orange,
+                  'Meu Perfil',
+                  Icons.person,
+                  Colors.grey.shade200,
+                  Colors.grey.shade700,
                   () {
-                    // Navigate to documents
-                  },
-                ),
-                _buildQuickAction(
-                  context,
-                  'Iniciar Trabalho',
-                  Icons.play_circle_outline,
-                  Colors.green.shade100,
-                  Colors.green,
-                  () {
-                    // Navigate to work
-                  },
-                ),
-                _buildQuickAction(
-                  context,
-                  'Ver Veículos',
-                  Icons.local_shipping,
-                  Colors.purple.shade100,
-                  Colors.purple,
-                  () {
-                    // Navigate to vehicles
+                    // Navigate to profile
                   },
                 ),
               ],

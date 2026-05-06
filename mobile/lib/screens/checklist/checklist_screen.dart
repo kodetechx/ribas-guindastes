@@ -82,18 +82,16 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checklist de Segurança'),
-        backgroundColor: const Color(0xFFFFD700),
-        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Selecione o Veículo', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Selecione o Veículo', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 8),
             DropdownButtonFormField<Equipment>(
-              value: _currentEquipment,
+              initialValue: _currentEquipment,
               isExpanded: true,
               items: equipments.map((e) {
                 return DropdownMenuItem(
@@ -102,37 +100,46 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 );
               }).toList(),
               onChanged: (val) => setState(() => _currentEquipment = val),
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
+                enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                fillColor: Colors.white,
+                filled: true,
+              ),
             ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Data e Hora:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())),
+                const Text('Data e Hora:', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+                Text(DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now()), style: TextStyle(color: Colors.grey.shade700)),
               ],
             ),
-            const Divider(height: 32),
-            const Text('Itens de Verificação', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+            const Divider(height: 32, color: Color(0xFFE0E0E0)),
+            const Text('Itens de Verificação', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+            const SizedBox(height: 12),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _checkItems.length,
               itemBuilder: (ctx, index) {
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
+                  margin: const EdgeInsets.only(bottom: 12),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_checkItems[index]['label']),
+                        Text(_checkItems[index]['label'], style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+                        const SizedBox(height: 12),
                         Row(
                           children: [
                             _buildStatusOption(index, 'ok', 'OK', Colors.green),
-                            _buildStatusOption(index, 'not_ok', 'Não OK', Colors.red),
-                            _buildStatusOption(index, 'na', 'N/A', Colors.grey),
+                            const SizedBox(width: 8),
+                            _buildStatusOption(index, 'not_ok', 'NÃO OK', Colors.red),
+                            const SizedBox(width: 8),
+                            _buildStatusOption(index, 'na', 'N/A', Colors.grey.shade600),
                           ],
                         ),
                       ],
@@ -141,19 +148,28 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 );
               },
             ),
-            const SizedBox(height: 16),
-            const Text('Observações', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 24),
+            const Text('Observações', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 8),
             TextField(
               controller: _notesController,
               maxLines: 3,
-              decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'Caso haja algum problema, descreva aqui...'),
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
+                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
+                hintText: 'Caso haja algum problema, descreva aqui...',
+                fillColor: Colors.white,
+                filled: true,
+              ),
             ),
             const SizedBox(height: 24),
-            const Text('Assinatura Digital', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Assinatura Digital', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 8),
             Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFFE0E0E0)),
+                borderRadius: BorderRadius.circular(4),
+              ),
               child: Signature(
                 controller: _signatureController,
                 height: 150,
@@ -165,7 +181,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               children: [
                 TextButton(
                   onPressed: () => _signatureController.clear(),
-                  child: const Text('Limpar Assinatura'),
+                  child: const Text('Limpar Assinatura', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
                 ),
               ],
             ),
@@ -175,14 +191,12 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               child: ElevatedButton(
                 onPressed: _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: const Color(0xFFFFD700),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('FINALIZAR CHECKLIST', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text('FINALIZAR CHECKLIST', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
           ],
         ),
       ),

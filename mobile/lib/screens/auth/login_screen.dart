@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
               'assets/images/guindaste.png',
               fit: BoxFit.cover,
               alignment: Alignment.center,
-              color: Colors.black.withOpacity(0.5), // Darken the image (approx 2x darker)
+              color: Colors.black.withValues(alpha: 0.5), // Darken the image (approx 2x darker)
               colorBlendMode: BlendMode.darken,
             ),
           ),
@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFF004466), width: 2),
+                            borderSide: const BorderSide(color: Color(0xFF1E3A8A), width: 2),
                           ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                         ),
@@ -167,13 +167,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFF004466), width: 2),
+                            borderSide: const BorderSide(color: Color(0xFF1E3A8A), width: 2),
                           ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                         ),
-                        obscureText: _obscurePassword,
-                        validator: (value) => value == null || value.length < 6 ? 'Senha curta' : null,
-                      ),
+                        obscureText: _obscurePassword,),
                       
                       const SizedBox(height: 8),
                       
@@ -202,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ElevatedButton(
                         onPressed: isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF004466),
+                          backgroundColor: const Color(0xFF1E3A8A),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(

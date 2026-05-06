@@ -67,7 +67,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFF004466), width: 2),
+                  borderSide: const BorderSide(color: Color(0xFF1E3A8A), width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               ),
@@ -81,7 +81,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                 setState(() => _isSent = true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF004466),
+                backgroundColor: const Color(0xFF1E3A8A),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(

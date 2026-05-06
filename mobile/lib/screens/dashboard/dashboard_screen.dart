@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import '../checklist/checklist_screen.dart';
-import '../documents/documents_screen.dart';
-import '../vehicles/vehicles_screen.dart';
-import '../work/work_screen.dart';
 import '../profile/profile_screen.dart';
 import 'home_tab.dart';
 
@@ -19,9 +16,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   static const List<Widget> _widgetOptions = <Widget>[
     HomeTab(),
     ChecklistScreen(),
-    DocumentsScreen(),
-    VehiclesScreen(),
-    WorkScreen(),
     ProfileScreen(),
   ];
 
@@ -41,9 +35,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
           BottomNavigationBarItem(icon: Icon(Icons.checklist), label: 'Checklist'),
-          BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Docs'),
-          BottomNavigationBarItem(icon: Icon(Icons.local_shipping), label: 'Veículos'),
-          BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Trabalho'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
         currentIndex: _selectedIndex,

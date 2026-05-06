@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'providers/auth_provider.dart';
 import 'providers/equipment_provider.dart';
 import 'providers/checklist_provider.dart';
-import 'providers/document_provider.dart';
-import 'providers/work_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 
@@ -23,23 +21,47 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => EquipmentProvider()),
         ChangeNotifierProvider(create: (_) => ChecklistProvider()),
-        ChangeNotifierProvider(create: (_) => DocumentProvider()),
-        ChangeNotifierProvider(create: (_) => WorkProvider()),
       ],
       child: MaterialApp(
         title: 'Ribas Guindastes',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.yellow,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.yellow,
-            primary: const Color(0xFFFFD700),
-            secondary: Colors.black,
-          ),
-          textTheme: GoogleFonts.robotoTextTheme(
-            Theme.of(context).textTheme,
-          ),
           useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF1E3A8A),
+            primary: const Color(0xFF1E3A8A),
+            secondary: const Color(0xFF1A1A1A),
+            surface: Colors.white,
+            surfaceContainerHighest: const Color(0xFFF5F5F5),
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF1E3A8A),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            centerTitle: true,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E3A8A),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              elevation: 0,
+            ),
+          ),
+          cardTheme: CardThemeData(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            color: Colors.white,
+          ),
+          textTheme: GoogleFonts.robotoTextTheme().copyWith(
+            titleLarge: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.bold),
+            bodyMedium: const TextStyle(color: Color(0xFF1A1A1A)),
+          ),
         ),
         home: const AuthWrapper(),
       ),
@@ -78,7 +100,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
 
         if (authProvider.isAuthenticated) {
-          return const DashboardScreen();
+        return const DashboardScreen();
         } else {
           return const LoginScreen();
         }

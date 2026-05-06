@@ -58,8 +58,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Meu Perfil'),
-        backgroundColor: const Color(0xFFFFD700),
-        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -70,50 +68,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: Colors.grey.shade100,
                     backgroundImage: user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
-                    child: user.photoUrl == null ? const Icon(Icons.person, size: 60, color: Colors.grey) : null,
+                    child: user.photoUrl == null ? const Icon(Icons.person, size: 60, color: Color(0xFFBDBDBD)) : null,
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
                     child: CircleAvatar(
-                      backgroundColor: const Color(0xFFFFD700),
-                      child: IconButton(icon: const Icon(Icons.camera_alt, color: Colors.black), onPressed: _pickImage),
+                      radius: 20,
+                      backgroundColor: const Color(0xFF1E3A8A),
+                      child: IconButton(
+                        icon: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 18), 
+                        onPressed: _pickImage
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            Text(user.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            Text(user.role.toUpperCase(), style: const TextStyle(color: Colors.grey, letterSpacing: 1.2)),
+            Text(user.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+            Text(user.role.toUpperCase(), style: const TextStyle(color: Colors.grey, letterSpacing: 1.2, fontSize: 12, fontWeight: FontWeight.w500)),
             const SizedBox(height: 32),
             _buildInfoTile('E-mail', user.email, Icons.email_outlined),
             _buildInfoTile('Matrícula', user.registrationNumber, Icons.badge_outlined),
             _buildInfoTile('CNH', '${user.cnh?.number ?? "N/A"} (${user.cnh?.category ?? ""})', Icons.drive_eta_outlined),
             _buildInfoTile('Admissão', user.createdAt != null ? DateFormat('dd/MM/yyyy').format(user.createdAt!) : 'N/A', Icons.calendar_today_outlined),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
             OutlinedButton.icon(
               onPressed: _changePassword,
-              icon: const Icon(Icons.lock_outline),
-              label: const Text('ALTERAR SENHA'),
-              style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+              icon: const Icon(Icons.lock_outline, size: 18),
+              label: const Text('ALTERAR MINHA SENHA', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                side: BorderSide(color: Colors.grey.shade300),
+                foregroundColor: const Color(0xFF333333),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              ),
             ),
             const SizedBox(height: 12),
-            ElevatedButton.icon(
+            TextButton.icon(
               onPressed: () => authProvider.logout(),
-              icon: const Icon(Icons.logout),
-              label: const Text('SAIR DA CONTA'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade50,
-                foregroundColor: Colors.red,
+              icon: const Icon(Icons.logout, size: 18),
+              label: const Text('SAIR DA CONTA', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red.shade700,
                 minimumSize: const Size(double.infinity, 50),
-                elevation: 0,
               ),
             ),
             const SizedBox(height: 48),
-            const Text('Versão 1.0.0', style: TextStyle(color: Colors.grey, fontSize: 12)),
+            const Text('VERSÃO 1.0.0', style: TextStyle(color: Color(0xFFBDBDBD), fontSize: 10, letterSpacing: 1)),
           ],
         ),
       ),
@@ -121,11 +126,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildInfoTile(String label, String value, IconData icon) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.black54),
-      title: Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-      subtitle: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
-      contentPadding: EdgeInsets.zero,
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFF5F5F5), width: 1)),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFF1E3A8A), size: 20),
+        title: Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w500)),
+        subtitle: Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF1A1A1A))),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4),
+      ),
     );
   }
 }
