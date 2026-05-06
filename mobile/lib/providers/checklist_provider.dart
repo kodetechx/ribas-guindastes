@@ -9,7 +9,7 @@ class ChecklistProvider with ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  Future<bool> submitChecklist(Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> submitChecklist(Map<String, dynamic> data) async {
     _isLoading = true;
     notifyListeners();
 
@@ -17,14 +17,23 @@ class ChecklistProvider with ChangeNotifier {
       final response = await _apiService.post('/checklists', data);
       _isLoading = false;
       notifyListeners();
-      return response.statusCode == 201 || response.statusCode == 200;
+      
+      final responseData = jsonDecode(response.body);
+      
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return {'success': true, 'message': 'Checklist enviado com sucesso!'};
+      } else {
+        return {
+          'success': false, 
+          'message': responseData['message'] ?? 'Erro desconhecido ao enviar checklist'
+        };
+      }
     } catch (e) {
       debugPrint('Submit checklist error: $e');
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'message': 'Falha na comunicação com o servidor: $e'};
     }
-
-    _isLoading = false;
-    notifyListeners();
-    return false;
   }
 
   Future<bool> checkToday(String equipmentId) async {
@@ -32,7 +41,8 @@ class ChecklistProvider with ChangeNotifier {
       final response = await _apiService.get('/checklists/equipment/$equipmentId/today');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['exists'] ?? false;
+        // Server returns { hasChecklist: boolean }
+        return data['hasChecklist'] ?? false;
       }
     } catch (e) {
       debugPrint('Check today error: $e');

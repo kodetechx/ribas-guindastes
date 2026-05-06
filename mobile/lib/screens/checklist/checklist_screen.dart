@@ -1,10 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../providers/equipment_provider.dart';
 import '../../providers/checklist_provider.dart';
 import '../../models/equipment.dart';
+import '../../services/api_service.dart';
 
 class ChecklistScreen extends StatefulWidget {
   final Equipment? selectedEquipment;
@@ -24,16 +28,76 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   );
 
   final List<Map<String, dynamic>> _checkItems = [
-    {'label': 'Cabos de aço em bom estado', 'status': 'ok'},
-    {'label': 'Sistema hidráulico sem vazamentos', 'status': 'ok'},
-    {'label': 'Pneus/esteiras em condições', 'status': 'ok'},
-    {'label': 'Sinalização sonora e visual funcionando', 'status': 'ok'},
-    {'label': 'Extintor de incêndio carregado', 'status': 'ok'},
-    {'label': 'Kit de primeiros socorros completo', 'status': 'ok'},
-    {'label': 'Freios funcionando corretamente', 'status': 'ok'},
-    {'label': 'Iluminação (faróis, lanternas) OK', 'status': 'ok'},
-    {'label': 'Cinto de segurança em bom estado', 'status': 'ok'},
-    {'label': 'Documentação e manuais a bordo', 'status': 'ok'},
+    {
+      'label': 'Nível de óleo do motor',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': false
+    },
+    {
+      'label': 'Nível de líquido de arrefecimento',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': false
+    },
+    {
+      'label': 'Estado dos pneus / lagartas',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': true
+    },
+    {
+      'label': 'Funcionamento dos freios',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': false
+    },
+    {
+      'label': 'Iluminação e sinalização',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': true
+    },
+    {
+      'label': 'Dispositivos de segurança (botão de emergência, etc.)',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': true
+    },
+    {
+      'label': 'Integridade estrutural (trincas, vazamentos)',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': true
+    },
+    {
+      'label': 'Painel de instrumentos',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': true
+    },
+    {
+      'label': 'Sinal sonoro de ré',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': false
+    },
+    {
+      'label': 'Extintor de incêndio',
+      'status': 'ok',
+      'controller': TextEditingController(),
+      'photo': null,
+      'hasPhoto': true
+    },
   ];
 
   @override
@@ -47,7 +111,21 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   void dispose() {
     _signatureController.dispose();
     _notesController.dispose();
+    for (var item in _checkItems) {
+      item['controller'].dispose();
+    }
     super.dispose();
+  }
+
+  Future<void> _pickImage(int index) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+
+    if (image != null) {
+      setState(() {
+        _checkItems[index]['photo'] = File(image.path);
+      });
+    }
   }
 
   void _submit() async {
@@ -61,18 +139,94 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       return;
     }
 
-    final success = await Provider.of<ChecklistProvider>(context, listen: false).submitChecklist({
-      'equipment': _currentEquipment!.id,
-      'items': _checkItems.map((i) => {'label': i['label'], 'status': i['status']}).toList(),
-      'notes': _notesController.text,
-      'isApproved': _checkItems.every((i) => i['status'] == 'ok'),
-      // Signature would be uploaded as image in a real app
-    });
+    final apiService = ApiService();
+    
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const Center(child: CircularProgressIndicator()),
+    );
 
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Checklist enviado com sucesso!')));
-      Navigator.of(context).pop(); // If opened from vehicle detail
+    try {
+      // 1. Upload signature first
+      final signatureBytes = await _signatureController.toPngBytes();
+      if (signatureBytes == null) throw Exception('Falha ao gerar imagem da assinatura');
+      
+      final tempDir = await getTemporaryDirectory();
+      final signatureFile = File('${tempDir.path}/signature_${DateTime.now().millisecondsSinceEpoch}.png');
+      await signatureFile.writeAsBytes(signatureBytes);
+      
+      final signatureUrl = await apiService.uploadImage(signatureFile);
+      if (signatureUrl == null) throw Exception('Falha ao enviar assinatura');
+
+      // 2. Upload item photos and build items list
+      final List<Map<String, dynamic>> itemsToSubmit = [];
+      
+      for (var item in _checkItems) {
+        String? photoUrl;
+        if (item['photo'] != null) {
+          photoUrl = await apiService.uploadImage(item['photo']);
+      }
+        
+        itemsToSubmit.add({
+          'label': item['label'],
+          'status': item['status'],
+          'observation': item['controller'].text,
+          'photoUrl': photoUrl,
+        });
+      }
+
+      // 3. Submit checklist
+      final result = await Provider.of<ChecklistProvider>(context, listen: false).submitChecklist({
+        'equipment': _currentEquipment!.id,
+        'items': itemsToSubmit,
+        'notes': _notesController.text,
+        'isApproved': _checkItems.every((i) => i['status'] != 'not_ok'),
+        'signatureUrl': signatureUrl,
+      });
+
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        
+        if (result['success']) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result['message']), backgroundColor: Colors.green),
+          );
+          Navigator.of(context).pop();
+        } else {
+          // Show specific error from server
+          _showErrorDialog(result['message']);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        _showErrorDialog(e.toString());
+      }
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Bloqueio de Segurança'),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('ENTENDIDO'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -81,17 +235,17 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Checklist de Segurança'),
+        title: const Text('Checklist Diário'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Selecione o Veículo', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+            const Text('Equipamento', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 8),
             DropdownButtonFormField<Equipment>(
-              initialValue: _currentEquipment,
+              value: _currentEquipment,
               isExpanded: true,
               items: equipments.map((e) {
                 return DropdownMenuItem(
@@ -117,13 +271,14 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               ],
             ),
             const Divider(height: 32, color: Color(0xFFE0E0E0)),
-            const Text('Itens de Verificação', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+            const Text('Itens de Inspeção', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 12),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _checkItems.length,
               itemBuilder: (ctx, index) {
+                final item = _checkItems[index];
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: Padding(
@@ -131,17 +286,56 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_checkItems[index]['label'], style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(item['label'], style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                            ),
+                            if (item['hasPhoto'])
+                              IconButton(
+                                icon: Icon(
+                                  item['photo'] != null ? Icons.check_circle : Icons.camera_alt,
+                                  color: item['photo'] != null ? Colors.green : Colors.grey,
+                                  size: 20,
+                                ),
+                                onPressed: () => _pickImage(index),
+                              ),
+                          ],
+                        ),
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            _buildStatusOption(index, 'ok', 'OK', Colors.green),
+                            _buildStatusOption(index, 'ok', Icons.check, Colors.green),
                             const SizedBox(width: 8),
-                            _buildStatusOption(index, 'not_ok', 'NÃO OK', Colors.red),
+                            _buildStatusOption(index, 'not_ok', Icons.close, Colors.red),
                             const SizedBox(width: 8),
-                            _buildStatusOption(index, 'na', 'N/A', Colors.grey.shade600),
+                            _buildStatusOption(index, 'na', null, Colors.blue, label: 'N/A'),
                           ],
                         ),
+                        if (item['status'] == 'not_ok') ...[
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: item['controller'],
+                            decoration: const InputDecoration(
+                              hintText: 'Descreva o problema...',
+                              hintStyle: TextStyle(fontSize: 12),
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                        ],
+                        if (item['photo'] != null) ...[
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.file(
+                              item['photo'] as File,
+                              height: 100,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ]
                       ],
                     ),
                   ),
@@ -149,7 +343,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               },
             ),
             const SizedBox(height: 24),
-            const Text('Observações', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+            const Text('Observações Gerais', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 8),
             TextField(
               controller: _notesController,
@@ -157,13 +351,13 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               decoration: const InputDecoration(
                 border: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
-                hintText: 'Caso haja algum problema, descreva aqui...',
+                hintText: 'Alguma observação adicional?',
                 fillColor: Colors.white,
                 filled: true,
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Assinatura Digital', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+            const Text('Assinatura do Operador', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
@@ -192,8 +386,9 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 onPressed: _submit,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: const Color(0xFF1E3A8A),
                 ),
-                child: const Text('FINALIZAR CHECKLIST', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                child: const Text('FINALIZAR E ENVIAR CHECKLIST', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
             const SizedBox(height: 24),
@@ -203,27 +398,24 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     );
   }
 
-  Widget _buildStatusOption(int index, String status, String label, Color color) {
+  Widget _buildStatusOption(int index, String status, IconData? icon, Color color, {String? label}) {
     final isSelected = _checkItems[index]['status'] == status;
     return Expanded(
       child: InkWell(
         onTap: () => setState(() => _checkItems[index]['status'] = status),
         child: Container(
-          margin: const EdgeInsets.all(4),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? color : Colors.transparent,
-            border: Border.all(color: color),
+            color: isSelected ? color : Colors.grey.shade100,
+            border: Border.all(color: isSelected ? color : Colors.grey.shade300),
             borderRadius: BorderRadius.circular(4),
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? Colors.white : color,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) Icon(icon, color: isSelected ? Colors.white : color, size: 16),
+              if (label != null) Text(label, style: TextStyle(color: isSelected ? Colors.white : color, fontWeight: FontWeight.bold, fontSize: 12)),
+            ],
           ),
         ),
       ),

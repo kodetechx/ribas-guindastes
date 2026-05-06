@@ -1,9 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/equipment_provider.dart';
+import '../scanner/qr_scanner_screen.dart';
+import '../checklist/checklist_screen.dart';
+import '../documents/documents_list_screen.dart';
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
+
+  Future<void> _scanQrCode(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const QrScannerScreen()),
+    );
+
+    if (result != null && result is String && context.mounted) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final equipmentProvider = Provider.of<EquipmentProvider>(context, listen: false);
+      
+      // 1. Validate Operator NRs
+      final user = authProvider.user;
+      if (user != null && user.nrs != null) {
+        final hasExpiredNr = user.nrs!.any((nr) => nr.expiresAt.isBefore(DateTime.now()));
+        if (hasExpiredNr) {
+          _showBlockingError(context, 'Bloqueio de Segurança', 'Você possui certificações NR vencidas. Procure o RH para regularização antes de operar.');
+          return;
+        }
+      }
+
+      // 2. Validate Equipment
+      final equipment = equipmentProvider.equipments.cast<dynamic>().firstWhere(
+        (e) => e.id == result,
+        orElse: () => null,
+      );
+
+      if (equipment != null) {
+        // Check Maintenance
+        if (equipment.nextMaintenance != null && equipment.nextMaintenance!.isBefore(DateTime.now())) {
+          _showBlockingError(context, 'Equipamento Bloqueado', 'Este equipamento está com manutenção vencida e não pode ser operado.');
+          return;
+        }
+
+        if (equipment.status == 'blocked') {
+          _showBlockingError(context, 'Equipamento Bloqueado', 'Este equipamento está bloqueado para uso no sistema.');
+          return;
+        }
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChecklistScreen(selectedEquipment: equipment),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Equipamento não encontrado ou QR Code inválido')),
+        );
+      }
+    }
+  }
+
+  void _showBlockingError(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(title, style: const TextStyle(color: Colors.red)),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('ENTENDIDO'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +91,10 @@ class HomeTab extends StatelessWidget {
         backgroundColor: const Color(0xFFFFD700),
         foregroundColor: Colors.black,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () => _scanQrCode(context),
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_none),
             onPressed: () {},
@@ -42,12 +122,34 @@ class HomeTab extends StatelessWidget {
               children: [
                 _buildQuickAction(
                   context,
+                  'Escanear QR Code',
+                  Icons.qr_code_scanner,
+                  const Color(0xFFFFD700).withOpacity(0.2),
+                  const Color(0xFFB8860B),
+                  () => _scanQrCode(context),
+                ),
+                _buildQuickAction(
+                  context,
                   'Realizar Checklist',
                   Icons.checklist,
                   Colors.blue.shade100,
                   Colors.blue,
                   () {
-                    // Navigate to checklist
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const ChecklistScreen()),
+                    );
+                  },
+                ),
+                _buildQuickAction(
+                  context,
+                  'Consultar Documentos',
+                  Icons.description,
+                  Colors.orange.shade100,
+                  Colors.orange.shade800,
+                  () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
+                    );
                   },
                 ),
                 _buildQuickAction(
@@ -57,7 +159,7 @@ class HomeTab extends StatelessWidget {
                   Colors.grey.shade200,
                   Colors.grey.shade700,
                   () {
-                    // Navigate to profile
+                    // Profile is in the bottom bar, but we can also navigate here
                   },
                 ),
               ],

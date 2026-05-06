@@ -4,6 +4,7 @@ export interface IChecklistItem {
   label: string;
   status: 'ok' | 'not_ok' | 'na';
   observation?: string;
+  photoUrl?: string;
 }
 
 export interface IChecklist extends Document {
@@ -28,6 +29,7 @@ const ChecklistSchema: Schema = new Schema(
         label: { type: String, required: true },
         status: { type: String, enum: ['ok', 'not_ok', 'na'], required: true },
         observation: { type: String },
+        photoUrl: { type: String },
       },
     ],
     isApproved: { type: Boolean, required: true },

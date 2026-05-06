@@ -56,6 +56,31 @@ class ApiService {
         .timeout(const Duration(seconds: 10));
   }
 
+  Future<String?> uploadImage(File file) async {
+    try {
+      final url = Uri.parse('$baseUrl/uploads');
+      final token = await getToken();
+      
+      var request = http.MultipartRequest('POST', url);
+      request.headers.addAll({
+        if (token != null) 'Authorization': 'Bearer $token',
+      });
+      
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+      
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['url']; // Assuming server returns { "url": "..." }
+      }
+    } catch (e) {
+      debugPrint('Upload image error: $e');
+    }
+    return null;
+  }
+
   Future<File> downloadFile(String url, String fileName) async {
     final response = await http.get(Uri.parse(url));
     final bytes = response.bodyBytes;
