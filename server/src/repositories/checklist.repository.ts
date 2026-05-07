@@ -10,7 +10,9 @@ export class ChecklistRepository {
   }
 
   async findByEquipment(equipmentId: string) {
-    return await Checklist.find({ equipment: equipmentId }).sort({ date: -1 });
+    return await Checklist.find({ equipment: equipmentId })
+      .populate('operator')
+      .sort({ createdAt: -1 });
   }
 
   async create(data: Partial<IChecklist>) {

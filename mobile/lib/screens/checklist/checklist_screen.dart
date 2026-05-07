@@ -4,11 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:signature/signature.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import '../../providers/equipment_provider.dart';
 import '../../providers/checklist_provider.dart';
 import '../../models/equipment.dart';
 import '../../services/api_service.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class ChecklistScreen extends StatefulWidget {
   final Equipment? selectedEquipment;
@@ -149,25 +149,14 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     );
 
     try {
-      // 1. Upload signature first
-      final signatureBytes = await _signatureController.toPngBytes();
-      if (signatureBytes == null) throw Exception('Falha ao gerar imagem da assinatura');
-      
-      final tempDir = await getTemporaryDirectory();
-      final signatureFile = File('${tempDir.path}/signature_${DateTime.now().millisecondsSinceEpoch}.png');
-      await signatureFile.writeAsBytes(signatureBytes);
-      
-      final signatureUrl = await apiService.uploadImage(signatureFile);
-      if (signatureUrl == null) throw Exception('Falha ao enviar assinatura');
-
-      // 2. Upload item photos and build items list
+      // 1. Upload item photos and build items list
       final List<Map<String, dynamic>> itemsToSubmit = [];
       
       for (var item in _checkItems) {
         String? photoUrl;
         if (item['photo'] != null) {
           photoUrl = await apiService.uploadImage(item['photo']);
-      }
+        }
         
         itemsToSubmit.add({
           'label': item['label'],
@@ -177,23 +166,20 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         });
       }
 
-      // 3. Submit checklist
+      // 2. Submit checklist (signature is just a flag, no URL needed)
       final result = await Provider.of<ChecklistProvider>(context, listen: false).submitChecklist({
         'equipment': _currentEquipment!.id,
         'items': itemsToSubmit,
         'notes': _notesController.text,
         'isApproved': _checkItems.every((i) => i['status'] != 'not_ok'),
-        'signatureUrl': signatureUrl,
+        // 'signatureUrl': signatureUrl, // Removed as requested
       });
 
       if (mounted) {
         Navigator.of(context).pop(); // Close loading dialog
         
         if (result['success']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result['message']), backgroundColor: Colors.green),
-          );
-          Navigator.of(context).pop();
+          _showSuccessDialog();
         } else {
           // Show specific error from server
           _showErrorDialog(result['message']);
@@ -205,6 +191,42 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
         _showErrorDialog(e.toString());
       }
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Column(
+          children: [
+            Icon(Icons.check_circle_outline, color: Colors.green, size: 64),
+            SizedBox(height: 16),
+            Text('Checklist Enviado!', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'O checklist foi registrado com sucesso. Você já pode operar o equipamento.',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(ctx).pop(); // Close dialog
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const DashboardScreen()),
+                  (route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+              child: const Text('VOLTAR PARA O INÍCIO', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showErrorDialog(String message) {
@@ -250,7 +272,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               items: equipments.map((e) {
                 return DropdownMenuItem(
                   value: e,
-                  child: Text('${e.model} - ${e.serialNumber}'),
+                  child: Text(e.name),
                 );
               }).toList(),
               onChanged: (val) => setState(() => _currentEquipment = val),
@@ -379,7 +401,36 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
+            if (_checkItems.any((i) => i['status'] == 'not_ok')) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  border: Border.all(color: Colors.red.shade200),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Atenção!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                          Text(
+                            'Existem itens não conformes. O equipamento poderá ser bloqueado para uso.',
+                            style: TextStyle(color: Colors.red.shade700, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
