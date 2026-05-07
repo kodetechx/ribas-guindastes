@@ -88,8 +88,8 @@ class HomeTab extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Painel do Operador'),
-        backgroundColor: const Color(0xFFFFD700),
-        foregroundColor: Colors.black,
+        backgroundColor: const Color(0xFF1E3A8A),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.qr_code_scanner),
@@ -111,7 +111,6 @@ class HomeTab extends StatelessWidget {
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text('O que você deseja fazer hoje?'),
             const SizedBox(height: 24),
             GridView.count(
               shrinkWrap: true,
@@ -124,8 +123,8 @@ class HomeTab extends StatelessWidget {
                   context,
                   'Escanear QR Code',
                   Icons.qr_code_scanner,
-                  const Color(0xFFFFD700).withOpacity(0.2),
-                  const Color(0xFFB8860B),
+                  Colors.blue.shade100,
+                  const Color.fromARGB(255, 0, 0, 0),
                   () => _scanQrCode(context),
                 ),
                 _buildQuickAction(
@@ -133,7 +132,7 @@ class HomeTab extends StatelessWidget {
                   'Realizar Checklist',
                   Icons.checklist,
                   Colors.blue.shade100,
-                  Colors.blue,
+                  Colors.black,
                   () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => const ChecklistScreen()),
@@ -144,8 +143,8 @@ class HomeTab extends StatelessWidget {
                   context,
                   'Consultar Documentos',
                   Icons.description,
-                  Colors.orange.shade100,
-                  Colors.orange.shade800,
+                  Colors.blue.shade100,
+                  Colors.black,
                   () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
@@ -156,8 +155,8 @@ class HomeTab extends StatelessWidget {
                   context,
                   'Meu Perfil',
                   Icons.person,
-                  Colors.grey.shade200,
-                  Colors.grey.shade700,
+                  Colors.blue.shade100,
+                  Colors.black,
                   () {
                     // Profile is in the bottom bar, but we can also navigate here
                   },
