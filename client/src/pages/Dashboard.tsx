@@ -76,7 +76,7 @@ const Dashboard = () => {
   );
 
   const filteredDocs = (stats?.alerts?.documentAlerts || []).filter((d: any) => 
-    d.operatorName.toLowerCase().includes(docSearch.toLowerCase()) ||
+    d.name.toLowerCase().includes(docSearch.toLowerCase()) ||
     d.docType.toLowerCase().includes(docSearch.toLowerCase())
   );
 
@@ -177,14 +177,14 @@ const Dashboard = () => {
           <div className="overflow-y-auto flex-1 pr-1 custom-scrollbar">
             {filteredDocs.length > 0 ? (
               <div className="space-y-3">
-                {filteredDocs.map((d: any, idx: number) => (
-                  <div key={idx} className={`flex items-center justify-between p-3 border rounded-sm ${d.status === 'expired' ? 'bg-red-50 border-red-100' : 'bg-orange-50 border-orange-100'}`}>
+                {filteredDocs.map((m: any, idx: number) => (
+                  <div key={idx} className={`flex items-center justify-between p-3 border rounded-sm ${m.status === 'expired' ? 'bg-red-50 border-red-100' : 'bg-orange-50 border-orange-100'}`}>
                     <div>
-                      <p className={`text-xs font-black uppercase tracking-tight ${d.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>{d.operatorName}</p>
-                      <p className={`text-[9px] font-black uppercase ${d.status === 'expired' ? 'text-red-700' : 'text-orange-700'}`}>{d.docType}</p>
+                      <p className={`text-xs font-black uppercase tracking-tight ${m.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>{m.name}</p>
+                      <p className={`text-[9px] font-black uppercase ${m.status === 'expired' ? 'text-red-700' : 'text-orange-700'}`}>{m.docType}</p>
                     </div>
-                    <span className={`text-[10px] font-mono font-bold ${d.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>
-                      {formatDateUTC(d.expiresAt)}
+                    <span className={`text-[10px] font-mono font-bold ${m.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>
+                      {formatDateUTC(m.expiresAt)}
                     </span>
                   </div>
                 ))}

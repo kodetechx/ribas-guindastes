@@ -48,7 +48,7 @@ export class StatsController {
       const operatorAlerts = expiringNRs.flatMap(op => 
         op.nrs.filter(nr => nr.expiresAt <= nextMonthLimit)
           .map(nr => ({
-            operatorName: op.name,
+            name: op.name,
             docType: nr.type,
             expiresAt: nr.expiresAt,
             status: nr.expiresAt < now ? 'expired' : 'warning'
@@ -58,10 +58,23 @@ export class StatsController {
       // 2. Alertas de Documentos Gerais
       const expiringGeneralDocs = await DocumentModel.find({
         expiresAt: { $lte: nextMonthLimit }
-      }).populate('ownerId', 'name');
+      });
+
+      // Mapear proprietários para evitar múltiplas queries (N+1)
+      const opIds = expiringGeneralDocs.filter(d => d.category === 'operator').map(d => d.ownerId);
+      const eqIds = expiringGeneralDocs.filter(d => d.category === 'equipment').map(d => d.ownerId);
+
+      const [docOperators, docEquipments] = await Promise.all([
+        Operator.find({ _id: { $in: opIds } }).select('name'),
+        Equipment.find({ _id: { $in: eqIds } }).select('name')
+      ]);
+
+      const ownerMap = new Map();
+      docOperators.forEach(o => ownerMap.set(o._id.toString(), o.name));
+      docEquipments.forEach(e => ownerMap.set(e._id.toString(), e.name));
 
       const generalAlerts = expiringGeneralDocs.map(doc => ({
-        operatorName: (doc.ownerId as any)?.name || 'N/A',
+        name: ownerMap.get(doc.ownerId.toString()) || 'N/A',
         docType: doc.name,
         expiresAt: doc.expiresAt,
         status: doc.status
