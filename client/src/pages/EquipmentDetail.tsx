@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Truck, Calendar, Settings, AlertTriangle, ClipboardList, CheckCircle, Wrench, Edit, Trash2, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import api from '../services/api';
 import MaintenanceForm from '../components/MaintenanceForm';
 import DocumentManager from '../components/DocumentManager';
@@ -8,6 +9,7 @@ import { formatDateUTC, formatDateTime } from '../utils/dateUtils';
 
 const EquipmentDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const qrRef = useRef<SVGSVGElement>(null);
   const [equipment, setEquipment] = useState<any>(null);
   const [checklists, setChecklists] = useState<any[]>([]);
   const [maintenances, setMaintenances] = useState<any[]>([]);
@@ -94,7 +96,47 @@ const EquipmentDetail = () => {
     </div>
   );
 
-  const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chl=${window.location.origin}/checklist/${id}&chs=200x200&chld=M|0`;
+  const qrValue = equipment.qrCode || id;
+
+  const handlePrintQR = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow || !qrRef.current) return;
+
+    const qrSvg = qrRef.current.outerHTML;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Etiqueta - ${equipment.name}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; text-align: center; }
+            .label-card { border: 2px solid #1e3a8a; padding: 40px; border-radius: 8px; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
+            .qr-code-wrapper { width: 250px; height: 250px; margin-bottom: 20px; }
+            .qr-code-wrapper svg { width: 100%; height: 100%; }
+            .equipment-name { font-size: 24px; font-weight: 900; margin: 0; text-transform: uppercase; color: #1e3a8a; }
+            .equipment-info { font-size: 14px; color: #64748b; font-weight: bold; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+            .serial { font-family: monospace; font-size: 12px; margin-top: 10px; color: #94a3b8; }
+            .footer { margin-top: 30px; font-size: 10px; font-weight: bold; color: #cbd5e1; text-transform: uppercase; }
+            @media print {
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="label-card">
+            <p style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 20px;">Identificação de Ativo</p>
+            <div class="qr-code-wrapper">${qrSvg}</div>
+            <h1 class="equipment-name">${equipment.name}</h1>
+            <p class="equipment-info">${equipment.brand} ${equipment.model}</p>
+            <p class="serial">S/N: ${equipment.serialNumber}</p>
+            <div class="footer">Sistema Ribas Guindastes</div>
+          </div>
+          <button class="no-print" style="margin-top: 20px; padding: 10px 20px; background: #1e3a8a; color: white; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;" onclick="window.print()">IMPRIMIR AGORA</button>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
   const statusStyles: any = {
     active: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', label: 'Ativo', icon: ShieldCheck },
@@ -172,9 +214,19 @@ const EquipmentDetail = () => {
           <div className="bg-white border border-gray-200 rounded-sm p-6 text-center shadow-sm">
             <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-4">Etiqueta de Identificação</p>
             <div className="bg-gray-50 p-4 border border-gray-100 rounded-sm inline-block mb-4">
-              <img src={qrUrl} alt="QR Code" className="w-32 h-32 mix-blend-multiply" />
+              <QRCodeSVG 
+                ref={qrRef}
+                value={qrValue} 
+                size={128}
+                level="M"
+                includeMargin={false}
+                className="mix-blend-multiply"
+              />
             </div>
-            <button className="mt-6 w-full py-2 bg-gray-50 border border-gray-200 rounded-sm text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-100 transition-colors">
+            <button 
+              onClick={handlePrintQR}
+              className="mt-6 w-full py-2 bg-gray-50 border border-gray-200 rounded-sm text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-100 transition-colors"
+            >
               Imprimir QR Code
             </button>
           </div>

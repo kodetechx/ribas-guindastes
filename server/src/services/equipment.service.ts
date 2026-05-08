@@ -17,8 +17,17 @@ export class EquipmentService {
   }
 
   async createEquipment(data: Partial<IEquipment>) {
-    // Adicionar lógica de negócio aqui se necessário (ex: gerar QR Code)
-    return await repository.create(data);
+    // O QR Code por padrão será o próprio ID do equipamento (gerado pelo MongoDB)
+    // Se precisarmos de um formato específico, podemos ajustar aqui
+    const equipment = await repository.create(data);
+    
+    // Se o campo qrCode estiver vazio, atualizamos com o ID gerado
+    if (!equipment.qrCode) {
+      equipment.qrCode = equipment._id.toString();
+      await repository.update(equipment._id.toString(), { qrCode: equipment.qrCode });
+    }
+    
+    return equipment;
   }
 
   async updateEquipment(id: string, data: Partial<IEquipment>) {
