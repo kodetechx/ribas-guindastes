@@ -37,11 +37,13 @@ class ChecklistItem {
   final String label;
   final String status; // 'ok', 'not_ok', 'na'
   final String? observation;
+  final String? photoUrl;
 
   ChecklistItem({
     required this.label,
     required this.status,
     this.observation,
+    this.photoUrl,
   });
 
   factory ChecklistItem.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,7 @@ class ChecklistItem {
       label: json['label'] ?? '',
       status: json['status'] ?? 'na',
       observation: json['observation'],
+      photoUrl: json['photoUrl'],
     );
   }
 
@@ -57,6 +60,7 @@ class ChecklistItem {
       'label': label,
       'status': status,
       'observation': observation,
+      'photoUrl': photoUrl,
     };
   }
 }
