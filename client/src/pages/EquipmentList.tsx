@@ -67,7 +67,7 @@ const EquipmentList = () => {
           onClick={() => { setEditingEquipment(null); setShowForm(true); }}
           className="btn-industrial btn-primary flex items-center justify-center gap-2 rounded-sm"
         >
-          <Plus size={16} />
+          <Plus size={20} />
           Novo Equipamento
         </button>
       </div>
@@ -85,7 +85,7 @@ const EquipmentList = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Filter size={20} className="text-gray-400" />
           <select 
             className="bg-industrial-gray/20 border border-gray-800 rounded-lg py-3 px-4 focus:outline-none focus:border-industrial-yellow/50 transition-colors text-sm"

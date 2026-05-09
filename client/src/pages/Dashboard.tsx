@@ -110,13 +110,13 @@ const Dashboard = () => {
         {/* Manutenções Próximas */}
         <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm flex flex-col h-[400px]">
           <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-gray-500">Manutenções Próximas</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest text-gray-510">Manutenções Próximas</h3>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <input 
                   type="text" 
                   placeholder="Filtrar..."
-                  className="text-[10px] border border-gray-200 rounded-sm px-2 py-1 outline-none focus:border-blue-900 w-24"
+                  className="text-[12px] border border-gray-200 rounded-sm px-2 py-1 outline-none focus:border-blue-900 w-34"
                   value={maintSearch}
                   onChange={(e) => setMaintSearch(e.target.value)}
                 />
@@ -155,13 +155,13 @@ const Dashboard = () => {
         {/* Alertas de Documentação */}
         <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm flex flex-col h-[400px]">
           <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-gray-500">Alertas de Documentação</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest text-gray-510">Alertas de Documentação</h3>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <input 
                   type="text" 
                   placeholder="Filtrar..."
-                  className="text-[10px] border border-gray-200 rounded-sm px-2 py-1 outline-none focus:border-blue-900 w-24"
+                  className="text-[12px] border border-gray-200 rounded-sm px-2 py-1 outline-none focus:border-blue-900 w-34"
                   value={docSearch}
                   onChange={(e) => setDocSearch(e.target.value)}
                 />
@@ -200,13 +200,13 @@ const Dashboard = () => {
         {/* Fluxo de Campo */}
         <div className="bg-white border border-gray-200 rounded-sm p-6 shadow-sm flex flex-col h-[400px]">
           <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-gray-500">Fluxo de Campo</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest text-gray-510">Fluxo de Campo</h3>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <input 
                   type="text" 
                   placeholder="Filtrar..."
-                  className="text-[10px] border border-gray-200 rounded-sm px-2 py-1 outline-none focus:border-blue-900 w-24"
+                  className="text-[12px] border border-gray-200 rounded-sm px-2 py-1 outline-none focus:border-blue-900 w-34"
                   value={checklistSearch}
                   onChange={(e) => setChecklistSearch(e.target.value)}
                 />

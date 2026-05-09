@@ -40,7 +40,7 @@ const Login: React.FC = () => {
         className="hidden md:flex w-full md:w-1/3 h-[250px] md:h-screen bg-cover bg-center relative items-center justify-center"
         style={{ backgroundImage: `url(${banner})` }}
       >
-        <div className="absolute inset-0 bg-[#004a7c]/90 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-[#004a7c]/95 backdrop-blur-[2px]"></div>
         <img src={logo} alt="Ribas Guindastes" className="w-48 h-48 object-contain drop-shadow-2xl relative z-10" />
       </div>
 
