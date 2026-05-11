@@ -3,18 +3,24 @@ import { EquipmentRepository } from '../repositories/equipment.repository';
 import { OperatorRepository } from '../repositories/operator.repository';
 import { ChecklistRepository } from '../repositories/checklist.repository';
 import { IService } from '../models/Service';
+import { AuditLogService } from './auditLog.service';
 
 const repository = new ServiceRepository();
 const equipmentRepository = new EquipmentRepository();
 const operatorRepository = new OperatorRepository();
 const checklistRepository = new ChecklistRepository();
+const auditLog = new AuditLogService();
 
 export class ServiceService {
   async getAllServices() {
     return await repository.findAll();
   }
 
-  async createService(data: Partial<IService>) {
+  async getServicesByOperator(operatorId: string) {
+    return await repository.findByOperator(operatorId);
+  }
+
+  async createService(data: Partial<IService>, userId?: string) {
     if (!data.equipment) throw new Error('Equipamento é obrigatório');
     
     const equipmentId = data.equipment.toString();
@@ -60,10 +66,25 @@ export class ServiceService {
       }
     }
 
-    return await repository.create(data);
+    const service = await repository.create(data);
+
+    if (userId) {
+      await auditLog.log(userId, 'CREATE', 'Service', service._id.toString(), { title: service.title, client: service.client });
+    }
+
+    return service;
   }
 
-  async updateService(id: string, data: Partial<IService>) {
-    return await repository.update(id, data);
+  async updateService(id: string, data: Partial<IService>, userId?: string) {
+    const updated = await repository.update(id, data);
+    if (!updated) {
+      throw new Error('Serviço não encontrado');
+    }
+
+    if (userId) {
+      await auditLog.log(userId, 'UPDATE', 'Service', id, { status: updated.status });
+    }
+
+    return updated;
   }
 }

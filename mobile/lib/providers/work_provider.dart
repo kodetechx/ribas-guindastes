@@ -15,18 +15,24 @@ class WorkProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isWorking => _activeService != null;
 
-  Future<void> fetchHistory() async {
+  Future<void> fetchHistory(String operatorId) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await _apiService.get('/services');
+      final response = await _apiService.get('/services/operator/$operatorId');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         _history = data.map((item) => WorkService.fromJson(item)).toList();
-        _activeService = _history.firstWhere((s) => s.status == 'in_progress', orElse: () => throw Exception('Not found'));
+        
+        try {
+          _activeService = _history.firstWhere((s) => s.status == 'in_progress');
+        } catch (_) {
+          _activeService = null;
+        }
       }
     } catch (e) {
+      debugPrint('Fetch history error: $e');
       _activeService = null;
     }
 
@@ -34,16 +40,20 @@ class WorkProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> startWork(Map<String, dynamic> data) async {
+  Future<bool> startWork(Map<String, dynamic> data, {String? serviceId}) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await _apiService.post('/services', {
+      final body = {
         ...data,
         'status': 'in_progress',
         'startDate': DateTime.now().toIso8601String(),
-      });
+      };
+
+      final response = serviceId != null
+          ? await _apiService.put('/services/$serviceId', body)
+          : await _apiService.post('/services', body);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         _activeService = WorkService.fromJson(jsonDecode(response.body));
@@ -60,7 +70,7 @@ class WorkProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> finishWork(String id, Map<String, dynamic> data) async {
+  Future<bool> finishWork(String id, Map<String, dynamic> data, String operatorId) async {
     _isLoading = true;
     notifyListeners();
 
@@ -73,7 +83,7 @@ class WorkProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         _activeService = null;
-        await fetchHistory();
+        await fetchHistory(operatorId);
         return true;
       }
     } catch (e) {

@@ -49,4 +49,16 @@ class ChecklistProvider with ChangeNotifier {
     }
     return false;
   }
+
+  Future<Map<String, dynamic>?> fetchTodayChecklist(String operatorId) async {
+    try {
+      final response = await _apiService.get('/checklists/operator/$operatorId/today');
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+    } catch (e) {
+      debugPrint('Fetch today checklist error: $e');
+    }
+    return null;
+  }
 }

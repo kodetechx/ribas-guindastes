@@ -1,9 +1,11 @@
 import { MaintenanceRepository } from '../repositories/maintenance.repository';
 import { EquipmentRepository } from '../repositories/equipment.repository';
 import { IMaintenance } from '../models/Maintenance';
+import { AuditLogService } from './auditLog.service';
 
 const repository = new MaintenanceRepository();
 const equipmentRepository = new EquipmentRepository();
+const auditLog = new AuditLogService();
 
 export class MaintenanceService {
   async getAllMaintenances() {
@@ -22,7 +24,7 @@ export class MaintenanceService {
     return await repository.findByEquipment(equipmentId);
   }
 
-  async createMaintenance(data: Partial<IMaintenance>) {
+  async createMaintenance(data: Partial<IMaintenance>, userId?: string) {
     // Normalizar datas para evitar shift de fuso horário (meio-dia UTC)
     if (data.date) {
       const d = new Date(data.date);
@@ -46,22 +48,37 @@ export class MaintenanceService {
       });
     }
 
+    if (userId) {
+      await auditLog.log(userId, 'CREATE', 'Maintenance', maintenance._id.toString(), { equipment: maintenance.equipment, description: maintenance.description });
+    }
+
     return maintenance;
   }
 
-  async updateMaintenance(id: string, data: Partial<IMaintenance>) {
+  async updateMaintenance(id: string, data: Partial<IMaintenance>, userId?: string) {
     const updated = await repository.update(id, data);
     if (!updated) {
       throw new Error('Manutenção não encontrada');
     }
+
+    if (userId) {
+      await auditLog.log(userId, 'UPDATE', 'Maintenance', id, data);
+    }
+
     return updated;
   }
 
-  async deleteMaintenance(id: string) {
+  async deleteMaintenance(id: string, userId?: string) {
+    const maintenance = await repository.findById(id);
     const deleted = await repository.delete(id);
     if (!deleted) {
       throw new Error('Manutenção não encontrada');
     }
+
+    if (userId) {
+      await auditLog.log(userId, 'DELETE', 'Maintenance', id, { equipment: maintenance?.equipment, description: maintenance?.description });
+    }
+
     return deleted;
   }
 }

@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'providers/auth_provider.dart';
 import 'providers/equipment_provider.dart';
 import 'providers/checklist_provider.dart';
+import 'providers/document_provider.dart';
+import 'providers/work_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 
@@ -21,6 +23,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => EquipmentProvider()),
         ChangeNotifierProvider(create: (_) => ChecklistProvider()),
+        ChangeNotifierProvider(create: (_) => DocumentProvider()),
+        ChangeNotifierProvider(create: (_) => WorkProvider()),
       ],
       child: MaterialApp(
         title: 'Ribas Guindastes',

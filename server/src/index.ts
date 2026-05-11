@@ -11,6 +11,7 @@ import maintenanceRoutes from './routes/maintenance.routes';
 import documentRoutes from './routes/document.routes';
 import serviceRoutes from './routes/service.routes';
 import uploadRoutes from './routes/upload.routes';
+import auditLogRoutes from './routes/auditLog.routes';
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use('/api/maintenances', maintenanceRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/logs', auditLogRoutes);
 
 // Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

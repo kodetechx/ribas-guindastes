@@ -82,11 +82,38 @@ class ApiService {
   }
 
   Future<File> downloadFile(String url, String fileName) async {
-    final response = await http.get(Uri.parse(url));
-    final bytes = response.bodyBytes;
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/$fileName');
-    await file.writeAsBytes(bytes);
-    return file;
+
+    // Simple cache: if file exists and has size > 0, return it
+    if (await file.exists() && await file.length() > 0) {
+      debugPrint('Usando arquivo em cache: $fileName');
+      return file;
+    }
+
+    try {
+      debugPrint('Baixando arquivo: $url');
+      final headers = await _getHeaders();
+      final response = await http.get(Uri.parse(url), headers: headers);
+      final bytes = response.bodyBytes;
+      await file.writeAsBytes(bytes);
+      return file;
+    } catch (e) {
+      debugPrint('Erro no download: $e');
+      if (await file.exists()) return file; // Fallback to old file if exists
+      rethrow;
+    }
+  }
+
+  String getFullUrl(String path) {
+    if (path.isEmpty) return '';
+    if (path.startsWith('http')) return path;
+    
+    // Remove /api if it's there to get the root URL
+    final rootUrl = baseUrl.endsWith('/api') 
+        ? baseUrl.substring(0, baseUrl.length - 4) 
+        : baseUrl;
+        
+    return '$rootUrl${path.startsWith('/') ? '' : '/'}$path';
   }
 }

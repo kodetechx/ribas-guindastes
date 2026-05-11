@@ -22,37 +22,37 @@ export class OperatorController {
     }
   };
 
-  public create = async (req: Request, res: Response) => {
+  public create = async (req: any, res: Response) => {
     try {
       const data = { ...req.body };
       if (req.file) {
         data.photoUrl = `/uploads/${req.file.filename}`;
         data.avatarUrl = `/uploads/${req.file.filename}`;
       }
-      const operator = await service.createOperator(data);
+      const operator = await service.createOperator(data, req.user?.id);
       res.status(201).json(operator);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
     }
   };
 
-  public update = async (req: Request, res: Response) => {
+  public update = async (req: any, res: Response) => {
     try {
       const data = { ...req.body };
       if (req.file) {
         data.photoUrl = `/uploads/${req.file.filename}`;
         data.avatarUrl = `/uploads/${req.file.filename}`;
       }
-      const operator = await service.updateOperator(req.params.id, data);
+      const operator = await service.updateOperator(req.params.id, data, req.user?.id);
       res.json(operator);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
     }
   };
 
-  public delete = async (req: Request, res: Response) => {
+  public delete = async (req: any, res: Response) => {
     try {
-      await service.deleteOperator(req.params.id);
+      await service.deleteOperator(req.params.id, req.user?.id);
       res.status(204).send();
     } catch (error) {
       res.status(404).json({ message: (error as Error).message });

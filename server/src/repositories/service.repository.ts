@@ -5,6 +5,10 @@ export class ServiceRepository {
     return await Service.find().populate('equipment').populate('operators');
   }
 
+  async findByOperator(operatorId: string) {
+    return await Service.find({ operators: operatorId }).populate('equipment').populate('operators').sort({ createdAt: -1 });
+  }
+
   async findActiveByEquipment(equipmentId: string) {
     return await Service.findOne({ 
       equipment: equipmentId, 

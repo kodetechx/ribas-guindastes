@@ -29,7 +29,7 @@ export class ChecklistController {
         ...req.body,
         operator: req.body.operator || req.user.id
       };
-      const newChecklist = await service.createChecklist(checklistData);
+      const newChecklist = await service.createChecklist(checklistData, req.user?.id);
       res.status(201).json(newChecklist);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -54,18 +54,27 @@ export class ChecklistController {
     }
   }
 
-  public update = async (req: Request, res: Response): Promise<void> => {
+  public getTodayByOperator = async (req: Request, res: Response): Promise<void> => {
     try {
-      const updated = await service.updateChecklist(req.params.id, req.body);
+      const checklist = await service.getTodayByOperator(req.params.operatorId);
+      res.status(200).json(checklist);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  public update = async (req: any, res: Response): Promise<void> => {
+    try {
+      const updated = await service.updateChecklist(req.params.id, req.body, req.user?.id);
       res.status(200).json(updated);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   }
 
-  public delete = async (req: Request, res: Response): Promise<void> => {
+  public delete = async (req: any, res: Response): Promise<void> => {
     try {
-      await service.deleteChecklist(req.params.id);
+      await service.deleteChecklist(req.params.id, req.user?.id);
       res.status(204).send();
     } catch (error: any) {
       res.status(400).json({ message: error.message });

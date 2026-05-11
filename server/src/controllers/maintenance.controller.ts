@@ -33,27 +33,27 @@ export class MaintenanceController {
     }
   };
 
-  public create = async (req: Request, res: Response) => {
+  public create = async (req: any, res: Response) => {
     try {
-      const maintenance = await service.createMaintenance(req.body);
+      const maintenance = await service.createMaintenance(req.body, req.user?.id);
       res.status(201).json(maintenance);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   };
 
-  public update = async (req: Request, res: Response) => {
+  public update = async (req: any, res: Response) => {
     try {
-      const maintenance = await service.updateMaintenance(req.params.id, req.body);
+      const maintenance = await service.updateMaintenance(req.params.id, req.body, req.user?.id);
       res.json(maintenance);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   };
 
-  public delete = async (req: Request, res: Response) => {
+  public delete = async (req: any, res: Response) => {
     try {
-      await service.deleteMaintenance(req.params.id);
+      await service.deleteMaintenance(req.params.id, req.user?.id);
       res.status(204).send();
     } catch (error: any) {
       res.status(404).json({ message: error.message });

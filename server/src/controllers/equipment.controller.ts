@@ -22,35 +22,35 @@ export class EquipmentController {
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: any, res: Response) {
     try {
       const data = { ...req.body };
       if (req.file) {
         data.imageUrl = `/uploads/${req.file.filename}`;
       }
-      const equipment = await service.createEquipment(data);
+      const equipment = await service.createEquipment(data, req.user?.id);
       res.status(201).json(equipment);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: any, res: Response) {
     try {
       const data = { ...req.body };
       if (req.file) {
         data.imageUrl = `/uploads/${req.file.filename}`;
       }
-      const equipment = await service.updateEquipment(req.params.id, data);
+      const equipment = await service.updateEquipment(req.params.id, data, req.user?.id);
       res.json(equipment);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: any, res: Response) {
     try {
-      await service.deleteEquipment(req.params.id);
+      await service.deleteEquipment(req.params.id, req.user?.id);
       res.status(204).send();
     } catch (error) {
       res.status(404).json({ message: (error as Error).message });

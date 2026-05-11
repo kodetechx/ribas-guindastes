@@ -9,6 +9,7 @@ router.get('/', protect, authorize('admin', 'manager'), controller.getAll);
 router.get('/:id', protect, controller.getById);
 router.get('/equipment/:equipmentId', protect, controller.getByEquipment);
 router.get('/equipment/:equipmentId/today', protect, controller.checkToday);
+router.get('/operator/:operatorId/today', protect, controller.getTodayByOperator);
 router.post('/', protect, controller.create);
 router.put('/:id', protect, authorize('admin', 'manager'), controller.update);
 router.delete('/:id', protect, authorize('admin', 'manager'), controller.delete);

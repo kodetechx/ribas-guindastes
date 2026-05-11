@@ -6,7 +6,8 @@ const router = Router();
 const controller = new ServiceController();
 
 router.get('/', protect, authorize('admin', 'manager'), controller.getAll);
-router.post('/', protect, authorize('admin', 'manager'), controller.create);
-router.put('/:id', protect, authorize('admin', 'manager'), controller.update);
+router.get('/operator/:operatorId', protect, controller.getByOperator);
+router.post('/', protect, controller.create);
+router.put('/:id', protect, controller.update);
 
 export default router;
