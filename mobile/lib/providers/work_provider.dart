@@ -3,12 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/service.dart';
 import '../services/api_service.dart';
+import '../services/local_database_service.dart';
+import '../services/connectivity_service.dart';
 
 class WorkProvider with ChangeNotifier {
   List<WorkService> _history = [];
   WorkService? _activeService;
   bool _isLoading = false;
   final ApiService _apiService = ApiService();
+  final LocalDatabaseService _localDb = LocalDatabaseService();
+  final ConnectivityService _connectivity = ConnectivityService();
 
   List<WorkService> get history => _history;
   WorkService? get activeService => _activeService;
@@ -19,28 +23,58 @@ class WorkProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    try {
-      final response = await _apiService.get('/services/operator/$operatorId');
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        _history = data.map((item) => WorkService.fromJson(item)).toList();
-        
-        try {
-          _activeService = _history.firstWhere((s) => s.status == 'in_progress');
-        } catch (_) {
-          _activeService = null;
+    final bool isOnline = await _connectivity.isConnected;
+
+    if (isOnline) {
+      try {
+        final response = await _apiService.get('/services/operator/$operatorId');
+        if (response.statusCode == 200) {
+          final List<dynamic> data = jsonDecode(response.body);
+          _history = data.map((item) => WorkService.fromJson(item)).toList();
+          
+          try {
+            _activeService = _history.firstWhere((s) => s.status == 'in_progress');
+          } catch (_) {
+            _activeService = null;
+          }
+
+          // Cache locally
+          await _localDb.saveList(LocalDatabaseService.servicesBox, 'history_$operatorId', data);
         }
+      } catch (e) {
+        debugPrint('Fetch history error (online): $e');
+        await _loadFromLocal(operatorId);
       }
-    } catch (e) {
-      debugPrint('Fetch history error: $e');
-      _activeService = null;
+    } else {
+      await _loadFromLocal(operatorId);
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
+  Future<void> _loadFromLocal(String operatorId) async {
+    final List<dynamic>? localData = _localDb.getList(LocalDatabaseService.servicesBox, 'history_$operatorId');
+    if (localData != null) {
+      _history = localData.map((item) => WorkService.fromJson(Map<String, dynamic>.from(item))).toList();
+      try {
+        _activeService = _history.firstWhere((s) => s.status == 'in_progress');
+      } catch (_) {
+        _activeService = null;
+      }
+    }
+  }
+
   Future<bool> startWork(Map<String, dynamic> data, {String? serviceId}) async {
+    // Starting/Finishing work usually requires being online in this business model
+    // unless we implement full background sync for service status changes.
+    // For now, let's keep it as an online-only action but with proper feedback.
+    final bool isOnline = await _connectivity.isConnected;
+    if (!isOnline) {
+      debugPrint('Cannot start work while offline');
+      return false;
+    }
+
     _isLoading = true;
     notifyListeners();
 
@@ -71,6 +105,12 @@ class WorkProvider with ChangeNotifier {
   }
 
   Future<bool> finishWork(String id, Map<String, dynamic> data, String operatorId) async {
+    final bool isOnline = await _connectivity.isConnected;
+    if (!isOnline) {
+      debugPrint('Cannot finish work while offline');
+      return false;
+    }
+
     _isLoading = true;
     notifyListeners();
 

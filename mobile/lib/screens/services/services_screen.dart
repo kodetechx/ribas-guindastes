@@ -152,8 +152,17 @@ class _ServicesScreenState extends State<ServicesScreen> {
       serviceId: service.id,
     );
 
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Serviço iniciado!')));
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Serviço iniciado!')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Não foi possível iniciar o serviço. Verifique sua conexão.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
     }
   }
 
@@ -192,9 +201,19 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 {'notes': notesController.text},
                 userId,
               );
-              if (success && mounted) {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Serviço finalizado!')));
+              
+              if (mounted) {
+                if (success) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Serviço finalizado!')));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Não foi possível finalizar o serviço. Verifique sua conexão.'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),

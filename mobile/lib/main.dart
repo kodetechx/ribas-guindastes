@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'providers/auth_provider.dart';
 import 'providers/equipment_provider.dart';
 import 'providers/checklist_provider.dart';
@@ -9,7 +10,18 @@ import 'providers/work_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Open boxes for caching
+  await Hive.openBox('settings');
+  await Hive.openBox('equipments');
+  await Hive.openBox('services');
+  await Hive.openBox('checklists_sync_queue');
+  
   runApp(const MyApp());
 }
 
