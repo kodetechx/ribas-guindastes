@@ -8,6 +8,7 @@ import '../../providers/work_provider.dart';
 import '../../providers/checklist_provider.dart';
 import '../../models/equipment.dart';
 import '../../services/connectivity_service.dart';
+import '../../services/api_service.dart';
 import '../scanner/qr_scanner_screen.dart';
 import '../checklist/checklist_screen.dart';
 import '../documents/documents_list_screen.dart';
@@ -24,6 +25,7 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   Map<String, dynamic>? _todayChecklist;
   final ConnectivityService _connectivity = ConnectivityService();
+  final ApiService _apiService = ApiService();
   bool _isOnline = true;
 
   @override
@@ -210,9 +212,24 @@ class _HomeTabState extends State<HomeTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Olá, ${user?.name ?? 'Operador'}!',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: user?.photoUrl != null 
+                              ? NetworkImage(_apiService.getFullUrl(user!.photoUrl!)) 
+                              : null,
+                          child: user?.photoUrl == null ? const Icon(Icons.person, color: Colors.grey, size: 30) : null,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Olá, ${user?.name ?? 'Operador'}!',
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
                     GridView.count(

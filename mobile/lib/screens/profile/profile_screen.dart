@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/api_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,6 +13,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final ApiService _apiService = ApiService();
+
   void _pickImage() async {
     final ImagePicker picker = ImagePicker();
     await picker.pickImage(source: ImageSource.gallery);
@@ -69,7 +72,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   CircleAvatar(
                     radius: 60,
                     backgroundColor: Colors.grey.shade100,
-                    backgroundImage: user.photoUrl != null ? NetworkImage(user.photoUrl!) : null,
+                    backgroundImage: user.photoUrl != null 
+                        ? NetworkImage(_apiService.getFullUrl(user.photoUrl!)) 
+                        : null,
                     child: user.photoUrl == null ? const Icon(Icons.person, size: 60, color: Color(0xFFBDBDBD)) : null,
                   ),
                   Positioned(
