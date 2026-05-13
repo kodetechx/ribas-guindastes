@@ -10,6 +10,7 @@ Desenvolver uma solução web (administração) e mobile-friendly (operadores) p
 * Certificações
 * Checklists operacionais
 * Gestão de equipamentos, operadores e serviços
+
 ---
 
 ## 🧱 Stack obrigatória
