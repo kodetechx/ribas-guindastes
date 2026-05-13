@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, MapPin, Truck, Play, CheckCircle } from 'lucide-react';
 import api from '../services/api';
 

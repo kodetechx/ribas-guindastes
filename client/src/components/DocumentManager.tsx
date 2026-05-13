@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Upload, Trash2, Download, Edit, AlertTriangle, CheckCircle, Clock, ExternalLink, Database, Search } from 'lucide-react';
+import { FileText, Trash2, Edit, ExternalLink } from 'lucide-react';
 import api from '../services/api';
 import DocumentUploadForm from './DocumentUploadForm';
 

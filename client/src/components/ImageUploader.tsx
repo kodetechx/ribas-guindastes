@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, X } from 'lucide-react';
+import { Camera } from 'lucide-react';
 
 interface Props {
   currentImage?: string;

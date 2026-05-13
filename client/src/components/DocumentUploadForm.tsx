@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, FileText, Calendar, Upload } from 'lucide-react';
+import { X, FileText } from 'lucide-react';
 import api from '../services/api';
 
 interface Props {

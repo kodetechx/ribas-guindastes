@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UserPlus, Search, Filter } from 'lucide-react';
 import { operatorService } from '../services/operatorService';
 import type { Operator } from '../services/operatorService';

@@ -1,5 +1,4 @@
-import React from 'react';
-import { LayoutDashboard, Truck, Users, FileText, Settings, LogOut, FileBadge } from 'lucide-react';
+import { LayoutDashboard, Truck, Users, FileText, LogOut, FileBadge } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 

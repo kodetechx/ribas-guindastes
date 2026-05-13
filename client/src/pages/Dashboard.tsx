@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Truck, AlertTriangle, FileWarning, CheckSquare, Clock, User, Search, Filter, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Truck, FileWarning, CheckSquare, Clock, User, Search, X } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import api from '../services/api';
-import { formatDateUTC, formatDateTime } from '../utils/dateUtils';
+import { formatDateUTC } from '../utils/dateUtils';
 
 const COLORS = ['#1E3A8A', '#F59E0B', '#EF4444', '#10B981'];
 

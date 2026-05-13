@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Mail, Shield, Settings, Link as LinkIcon, Trash2 } from 'lucide-react';
+import { User, Mail, Shield, Settings, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 

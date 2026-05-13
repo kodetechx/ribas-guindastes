@@ -1,5 +1,5 @@
 import React from 'react';
-import { Truck, MapPin, Calendar, Clock, Edit, Settings, Trash2 } from 'lucide-react';
+import { Truck, Calendar, Settings, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Truck, Calendar, Settings, AlertTriangle, ClipboardList, CheckCircle, Wrench, Edit, Trash2, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react';
+import { Truck, AlertTriangle, ClipboardList, Wrench, Edit, Trash2, ShieldCheck, ShieldAlert, ShieldX } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import api from '../services/api';
 import MaintenanceForm from '../components/MaintenanceForm';
@@ -152,7 +152,7 @@ const EquipmentDetail = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b border-gray-200 pb-6">
         <div className="flex items-center gap-4">
           <Link to="/equipamentos" className="p-2 bg-white border border-gray-200 rounded-sm text-gray-400 hover:text-blue-900 transition-colors">
-            <svg size={20} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </Link>
           <div>
             <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">{equipment.name}</h2>

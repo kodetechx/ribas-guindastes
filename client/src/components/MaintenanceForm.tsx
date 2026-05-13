@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Calendar, Wrench } from 'lucide-react';
+import { X, Save, Wrench } from 'lucide-react';
 import api from '../services/api';
 
 interface MaintenanceFormProps {

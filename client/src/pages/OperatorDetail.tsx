@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { User, Shield, AlertTriangle, FileBadge, Calendar } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import api from '../services/api';
 import DocumentManager from '../components/DocumentManager';
 import { formatDateUTC } from '../utils/dateUtils';

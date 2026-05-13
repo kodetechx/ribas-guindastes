@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
 import { equipmentService } from '../services/equipmentService';
 import type { Equipment } from '../services/equipmentService';
