@@ -1,31 +1,27 @@
 {
   "compilerOptions": {
-    /* Diretórios */
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
 
-    /* Ambiente Node */
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "target": "ES2020",
-    "types": ["node"],
-
-    /* Compatibilidade */
+    "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
     "resolveJsonModule": true,
 
-    /* Debug */
     "sourceMap": true,
 
-    /* Tipagem */
-    "strict": true,
-    "skipLibCheck": true,
+    "types": ["node"],
     "ignoreDeprecations": "6.0",
-
-    /* Correção do problema */
-    "verbatimModuleSyntax": false
+    "noImplicitAny": false
   },
 
-  "include": ["src"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

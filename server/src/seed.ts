@@ -6,9 +6,9 @@ import Operator from './models/Operator';
 dotenv.config();
 
 const equipmentSeedData = [
-  { name: 'Guindaste RT 530', brand: 'Grove', model: 'RT 530E-2', year: 2018, serialNumber: 'GRV-7821-X', status: 'active' },
-  { name: 'Empilhadeira Diesel 7t', brand: 'Hyster', model: 'H155FT', year: 2020, serialNumber: 'HYS-9902-B', status: 'maintenance' },
-  { name: 'Caminhão Munck 45tm', brand: 'Mercedes-Benz', model: 'Axor 2644', year: 2022, serialNumber: 'MB-4412-M', status: 'active' },
+  { name: 'Guindaste RT 530', brand: 'Grove', equipmentModel: 'RT 530E-2', year: 2018, serialNumber: 'GRV-7821-X', status: 'active' },
+  { name: 'Empilhadeira Diesel 7t', brand: 'Hyster', equipmentModel: 'H155FT', year: 2020, serialNumber: 'HYS-9902-B', status: 'maintenance' },
+  { name: 'Caminhão Munck 45tm', brand: 'Mercedes-Benz', equipmentModel: 'Axor 2644', year: 2022, serialNumber: 'MB-4412-M', status: 'active' },
 ];
 
 const operatorSeedData = [

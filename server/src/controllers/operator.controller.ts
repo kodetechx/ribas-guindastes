@@ -15,7 +15,7 @@ export class OperatorController {
 
   public getById = async (req: Request, res: Response) => {
     try {
-      const operator = await service.getOperatorById(req.params.id);
+      const operator = await service.getOperatorById(String(req.params.id));
       res.json(operator);
     } catch (error) {
       res.status(404).json({ message: (error as Error).message });
@@ -43,7 +43,7 @@ export class OperatorController {
         data.photoUrl = `/uploads/${req.file.filename}`;
         data.avatarUrl = `/uploads/${req.file.filename}`;
       }
-      const operator = await service.updateOperator(req.params.id, data, req.user?.id);
+      const operator = await service.updateOperator(String(req.params.id), data, req.user?.id);
       res.json(operator);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
@@ -52,7 +52,7 @@ export class OperatorController {
 
   public delete = async (req: any, res: Response) => {
     try {
-      await service.deleteOperator(req.params.id, req.user?.id);
+      await service.deleteOperator(String(req.params.id), req.user?.id);
       res.status(204).send();
     } catch (error) {
       res.status(404).json({ message: (error as Error).message });

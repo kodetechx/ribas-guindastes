@@ -15,7 +15,7 @@ export class EquipmentController {
 
   async getById(req: Request, res: Response) {
     try {
-      const equipment = await service.getEquipmentById(req.params.id);
+      const equipment = await service.getEquipmentById(String(req.params.id));
       res.json(equipment);
     } catch (error) {
       res.status(404).json({ message: (error as Error).message });
@@ -41,7 +41,7 @@ export class EquipmentController {
       if (req.file) {
         data.imageUrl = `/uploads/${req.file.filename}`;
       }
-      const equipment = await service.updateEquipment(req.params.id, data, req.user?.id);
+      const equipment = await service.updateEquipment(String(req.params.id), data, req.user?.id);
       res.json(equipment);
     } catch (error) {
       res.status(400).json({ message: (error as Error).message });
@@ -50,7 +50,7 @@ export class EquipmentController {
 
   async delete(req: any, res: Response) {
     try {
-      await service.deleteEquipment(req.params.id, req.user?.id);
+      await service.deleteEquipment(String(req.params.id), req.user?.id);
       res.status(204).send();
     } catch (error) {
       res.status(404).json({ message: (error as Error).message });

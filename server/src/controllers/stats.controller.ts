@@ -90,7 +90,7 @@ export class StatsController {
       ];
 
       // Custos de Manutenção
-      const months = [];
+      const months: { month: string; start: Date; end: Date }[] = [];
       for (let i = 3; i >= 0; i--) {
         const d = new Date();
         d.setMonth(d.getMonth() - i);

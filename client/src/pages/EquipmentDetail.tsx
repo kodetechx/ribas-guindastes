@@ -127,7 +127,7 @@ const EquipmentDetail = () => {
             <p style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 20px;">Identificação de Ativo</p>
             <div class="qr-code-wrapper">${qrSvg}</div>
             <h1 class="equipment-name">${equipment.name}</h1>
-            <p class="equipment-info">${equipment.brand} ${equipment.model}</p>
+            <p class="equipment-info">${equipment.brand} ${equipment.equipmentModel}</p>
             <p class="serial">S/N: ${equipment.serialNumber}</p>
             <div class="footer">Sistema Ribas Guindastes</div>
           </div>
@@ -237,7 +237,7 @@ const EquipmentDetail = () => {
             <div className="space-y-4">
               <div>
                 <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-1">Marca / Modelo</p>
-                <p className="text-sm font-bold text-gray-800 uppercase">{equipment.brand} {equipment.model}</p>
+                <p className="text-sm font-bold text-gray-800 uppercase">{equipment.brand} {equipment.equipmentModel}</p>
               </div>
               <div>
                 <p className="text-[9px] uppercase text-gray-400 font-black tracking-widest mb-1">Ano</p>

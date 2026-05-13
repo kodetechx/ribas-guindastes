@@ -15,7 +15,7 @@ export class ChecklistController {
 
   public getById = async (req: Request, res: Response): Promise<void> => {
     try {
-      const checklist = await service.getChecklistById(req.params.id);
+      const checklist = await service.getChecklistById(String(req.params.id));
       res.status(200).json(checklist);
     } catch (error: any) {
       res.status(404).json({ message: error.message });
@@ -38,7 +38,7 @@ export class ChecklistController {
 
   public getByEquipment = async (req: Request, res: Response): Promise<void> => {
     try {
-      const checklists = await service.getByEquipment(req.params.equipmentId);
+      const checklists = await service.getByEquipment(String(req.params.equipmentId));
       res.status(200).json(checklists);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -47,7 +47,7 @@ export class ChecklistController {
   
   public checkToday = async (req: Request, res: Response): Promise<void> => {
     try {
-      const exists = await service.checkToday(req.params.equipmentId);
+      const exists = await service.checkToday(String(req.params.equipmentId));
       res.status(200).json({ hasChecklist: exists });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -56,7 +56,7 @@ export class ChecklistController {
 
   public getTodayByOperator = async (req: Request, res: Response): Promise<void> => {
     try {
-      const checklist = await service.getTodayByOperator(req.params.operatorId);
+      const checklist = await service.getTodayByOperator(String(req.params.operatorId));
       res.status(200).json(checklist);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -65,7 +65,7 @@ export class ChecklistController {
 
   public update = async (req: any, res: Response): Promise<void> => {
     try {
-      const updated = await service.updateChecklist(req.params.id, req.body, req.user?.id);
+      const updated = await service.updateChecklist(String(req.params.id), req.body, req.user?.id);
       res.status(200).json(updated);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -74,7 +74,7 @@ export class ChecklistController {
 
   public delete = async (req: any, res: Response): Promise<void> => {
     try {
-      await service.deleteChecklist(req.params.id, req.user?.id);
+      await service.deleteChecklist(String(req.params.id), req.user?.id);
       res.status(204).send();
     } catch (error: any) {
       res.status(400).json({ message: error.message });

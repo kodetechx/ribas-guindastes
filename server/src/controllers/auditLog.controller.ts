@@ -17,7 +17,7 @@ export class AuditLogController {
   public getByTarget = async (req: Request, res: Response): Promise<void> => {
     try {
       const { model, id } = req.params;
-      const logs = await service.getTargetLogs(model, id);
+      const logs = await service.getTargetLogs(String(model), String(id));
       res.status(200).json(logs);
     } catch (error: any) {
       res.status(500).json({ message: error.message });

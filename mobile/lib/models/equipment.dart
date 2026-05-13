@@ -2,7 +2,7 @@ class Equipment {
   final String id;
   final String name;
   final String brand;
-  final String model;
+  final String equipmentModel;
   final int year;
   final String serialNumber;
   final String status; // 'active', 'maintenance', 'blocked'
@@ -17,7 +17,7 @@ class Equipment {
     required this.id,
     required this.name,
     required this.brand,
-    required this.model,
+    required this.equipmentModel,
     required this.year,
     required this.serialNumber,
     required this.status,
@@ -34,7 +34,7 @@ class Equipment {
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
       brand: json['brand'] ?? '',
-      model: json['model'] ?? '',
+      equipmentModel: json['equipmentModel'] ?? '',
       year: json['year'] ?? 0,
       serialNumber: json['serialNumber'] ?? '',
       status: json['status'] ?? 'active',

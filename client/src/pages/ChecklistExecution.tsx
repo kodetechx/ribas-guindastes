@@ -92,7 +92,7 @@ const ChecklistExecution = () => {
           </div>
           <div>
             <h3 className="text-xl font-bold">{equipment.name}</h3>
-            <p className="text-gray-400">{equipment.brand} {equipment.model} • S/N: {equipment.serialNumber}</p>
+            <p className="text-gray-400">{equipment.brand} {equipment.equipmentModel} • S/N: {equipment.serialNumber}</p>
           </div>
         </div>
       </div>

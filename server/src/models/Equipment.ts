@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IEquipment extends Document {
   name: string;
   brand: string;
-  model: string;
+  equipmentModel: string;
   year: number;
   serialNumber: string;
   status: 'active' | 'maintenance' | 'blocked';
@@ -19,7 +19,7 @@ const EquipmentSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
     brand: { type: String, required: true },
-    model: { type: String, required: true },
+    equipmentModel: { type: String, required: true },
     year: { type: Number, required: true },
     serialNumber: { type: String, required: true, unique: true },
     status: {

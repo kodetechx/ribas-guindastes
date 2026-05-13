@@ -11,7 +11,7 @@ interface Props {
 
 const EquipmentForm: React.FC<Props> = ({ initialData, onClose, onSuccess }) => {
   const [formData, setFormData] = useState(initialData || {
-    name: '', brand: '', model: '', year: new Date().getFullYear(), serialNumber: '', status: 'active'
+    name: '', brand: '', equipmentModel: '', year: new Date().getFullYear(), serialNumber: '', status: 'active'
   });
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,7 +56,7 @@ const EquipmentForm: React.FC<Props> = ({ initialData, onClose, onSuccess }) => 
           <ImageUploader onImageChange={setImage} currentImage={initialData?.imageUrl} />
           <input type="text" placeholder="Nome" className="w-full border p-2 text-sm" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
           <input type="text" placeholder="Marca" className="w-full border p-2 text-sm" value={formData.brand} onChange={(e) => setFormData({...formData, brand: e.target.value})} required />
-          <input type="text" placeholder="Modelo" className="w-full border p-2 text-sm" value={formData.model} onChange={(e) => setFormData({...formData, model: e.target.value})} required />
+          <input type="text" placeholder="Modelo" className="w-full border p-2 text-sm" value={formData.equipmentModel} onChange={(e) => setFormData({...formData, equipmentModel: e.target.value})} required />
           <input type="number" placeholder="Ano" className="w-full border p-2 text-sm" value={formData.year} onChange={(e) => setFormData({...formData, year: Number(e.target.value)})} required />
           <input type="text" placeholder="Número de Série" className="w-full border p-2 text-sm" value={formData.serialNumber} onChange={(e) => setFormData({...formData, serialNumber: e.target.value})} required />
           <button disabled={loading} className="w-full bg-blue-900 text-white py-3 font-bold uppercase text-[10px] tracking-widest hover:bg-blue-800 transition-colors">Salvar</button>

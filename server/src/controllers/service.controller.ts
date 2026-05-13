@@ -15,7 +15,7 @@ export class ServiceController {
 
   public async getByOperator(req: Request, res: Response): Promise<void> {
     try {
-      const services = await service.getServicesByOperator(req.params.operatorId);
+      const services = await service.getServicesByOperator(String(req.params.operatorId));
       res.status(200).json(services);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -33,7 +33,7 @@ export class ServiceController {
 
   public async update(req: any, res: Response): Promise<void> {
     try {
-      const updated = await service.updateService(req.params.id, req.body, req.user?.id);
+      const updated = await service.updateService(String(req.params.id), req.body, req.user?.id);
       res.status(200).json(updated);
     } catch (error: any) {
       res.status(400).json({ message: error.message });

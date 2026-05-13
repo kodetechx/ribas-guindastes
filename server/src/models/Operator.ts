@@ -19,6 +19,7 @@ export interface IOperator extends Document {
   nrs: INR[];
   isActive: boolean;
   photoUrl?: string;
+  avatarUrl?: string;
   role: 'admin' | 'manager' | 'operator';
   createdAt: Date;
   updatedAt: Date;

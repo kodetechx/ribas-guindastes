@@ -47,7 +47,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment, onRefresh, onE
             </div>
             <div>
               <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">{equipment.name}</h3>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{equipment.brand} • {equipment.model}</p>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{equipment.brand} • {equipment.equipmentModel}</p>
             </div>
           </div>
           <div className="flex gap-1">

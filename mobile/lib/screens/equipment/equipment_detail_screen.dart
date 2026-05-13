@@ -99,7 +99,7 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
                 const SizedBox(height: 12),
                 _buildInfoCard([
                   _buildDetailRow('Marca', equipment.brand),
-                  _buildDetailRow('Modelo', equipment.model),
+                  _buildDetailRow('Modelo', equipment.equipmentModel),
                   _buildDetailRow('Ano', equipment.year.toString()),
                   _buildDetailRow('Nº de Série', equipment.serialNumber),
                   if (equipment.capacity != null)

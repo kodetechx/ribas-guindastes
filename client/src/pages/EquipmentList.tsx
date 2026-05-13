@@ -39,7 +39,7 @@ const EquipmentList = () => {
       result = result.filter(eq => 
         eq.name.toLowerCase().includes(term) || 
         eq.brand.toLowerCase().includes(term) || 
-        eq.model.toLowerCase().includes(term) ||
+        eq.equipmentModel.toLowerCase().includes(term) ||
         eq.serialNumber.toLowerCase().includes(term)
       );
     }

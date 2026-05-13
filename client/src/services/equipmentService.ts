@@ -4,7 +4,7 @@ export interface Equipment {
   _id: string;
   name: string;
   brand: string;
-  model: string;
+  equipmentModel: string;
   year: number;
   serialNumber: string;
   status: 'active' | 'maintenance' | 'blocked';
