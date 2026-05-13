@@ -52,4 +52,33 @@ class EquipmentProvider with ChangeNotifier {
       _equipments = localData.map((item) => Equipment.fromJson(Map<String, dynamic>.from(item))).toList();
     }
   }
+
+  Future<Equipment?> fetchEquipmentById(String id) async {
+    // First try local
+    try {
+      return _equipments.firstWhere((e) => e.id == id || e.serialNumber == id);
+    } catch (_) {
+      // Not found local, try online if possible
+      final bool isOnline = await _connectivity.isConnected;
+      if (isOnline) {
+        try {
+          final response = await _apiService.get('/equipments/$id');
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final equipment = Equipment.fromJson(data);
+            
+            // Add to local list if not present
+            if (!_equipments.any((e) => e.id == equipment.id)) {
+              _equipments.add(equipment);
+              notifyListeners();
+            }
+            return equipment;
+          }
+        } catch (e) {
+          debugPrint('Fetch equipment by ID error: $e');
+        }
+      }
+    }
+    return null;
+  }
 }

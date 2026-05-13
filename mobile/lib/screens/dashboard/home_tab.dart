@@ -46,10 +46,12 @@ class _HomeTabState extends State<HomeTab> {
       final docProvider = Provider.of<DocumentProvider>(context, listen: false);
       final workProvider = Provider.of<WorkProvider>(context, listen: false);
       final checklistProvider = Provider.of<ChecklistProvider>(context, listen: false);
+      final equipmentProvider = Provider.of<EquipmentProvider>(context, listen: false);
 
       await Future.wait([
         docProvider.fetchDocuments(user.id, 'operator'),
         workProvider.fetchHistory(user.id),
+        equipmentProvider.fetchEquipments(),
         checklistProvider.fetchTodayChecklist(user.id).then((val) {
           if (mounted) setState(() => _todayChecklist = val);
         }),
@@ -76,29 +78,34 @@ class _HomeTabState extends State<HomeTab> {
         }
       }
 
-      // 2. Validate Equipment (Offline: search in cached equipments)
-      try {
-        final equipment = equipmentProvider.equipments.firstWhere(
-          (e) => e.id == result || e.serialNumber == result,
-        );
+      // 2. Validate Equipment
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => const Center(child: CircularProgressIndicator()),
+      );
 
-        if (equipment != null) {
-          // Check Maintenance
-          if (equipment.nextMaintenance != null && equipment.nextMaintenance!.isBefore(DateTime.now())) {
-            _showBlockingError(context, 'Equipamento Bloqueado', 'Este equipamento está com manutenção vencida e não pode ser operado.');
-            return;
-          }
+      final equipment = await equipmentProvider.fetchEquipmentById(result);
+      
+      if (context.mounted) Navigator.pop(context); // Close loading
 
-          if (equipment.status == 'blocked') {
-            _showBlockingError(context, 'Equipamento Bloqueado', 'Este equipamento está bloqueado para uso no sistema.');
-            return;
-          }
-
-          _showEquipmentActionDialog(context, equipment);
+      if (equipment != null) {
+        // Check Maintenance
+        if (equipment.nextMaintenance != null && equipment.nextMaintenance!.isBefore(DateTime.now())) {
+          _showBlockingError(context, 'Equipamento Bloqueado', 'Este equipamento está com manutenção vencida e não pode ser operado.');
+          return;
         }
-      } catch (e) {
+
+        if (equipment.status == 'blocked') {
+          _showBlockingError(context, 'Equipamento Bloqueado', 'Este equipamento está bloqueado para uso no sistema.');
+          return;
+        }
+
+        _showEquipmentActionDialog(context, equipment);
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Equipamento não encontrado localmente. Verifique sua conexão.')),
+          const SnackBar(content: Text('Equipamento não encontrado. Verifique se o QR Code está correto ou se há conexão com a internet.')),
         );
       }
     }

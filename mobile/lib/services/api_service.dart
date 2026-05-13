@@ -10,8 +10,9 @@ class ApiService {
     if (kIsWeb) {
       return 'http://localhost:5000/api';
     }
-    if (Platform.isAndroid) {
-      return 'http://10.0.2.2:5000/api';
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Usar o IP da máquina na rede local para dispositivos físicos
+      return 'http://192.168.15.95:5000/api';
     }
     return 'http://localhost:5000/api';
   }
