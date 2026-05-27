@@ -30,8 +30,13 @@ class _ServicesScreenState extends State<ServicesScreen> {
     final user = Provider.of<AuthProvider>(context).user;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text('Ordens de Serviço'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: workProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -42,7 +47,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 }
               },
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
                 itemCount: workProvider.history.length,
                 itemBuilder: (ctx, index) {
                   final service = workProvider.history[index];
@@ -58,15 +63,20 @@ class _ServicesScreenState extends State<ServicesScreen> {
     String statusText = 'Pendente';
 
     if (service.status == 'in_progress') {
-      statusColor = Colors.blue;
+      statusColor = const Color(0xFF1E3A8A);
       statusText = 'Em Andamento';
     } else if (service.status == 'finished') {
       statusColor = Colors.green;
       statusText = 'Finalizado';
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE0E0E0)),
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -78,50 +88,43 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 Expanded(
                   child: Text(
                     service.title,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1A1A1A)),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: statusColor),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                   child: Text(
                     statusText.toUpperCase(),
-                    style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            _buildInfoRow(Icons.business, 'Cliente', service.client),
+            const SizedBox(height: 14),
+            _buildInfoRow(Icons.business_outlined, 'Cliente', service.client),
             const SizedBox(height: 8),
-            _buildInfoRow(Icons.location_on, 'Local', service.location),
+            _buildInfoRow(Icons.location_on_outlined, 'Local', service.location),
             const SizedBox(height: 8),
-            _buildInfoRow(Icons.calendar_today, 'Início', DateFormat('dd/MM/yyyy HH:mm').format(service.startDate)),
+            _buildInfoRow(Icons.calendar_today_outlined, 'Início', DateFormat('dd/MM/yyyy HH:mm').format(service.startDate)),
             if (service.endDate != null) ...[
               const SizedBox(height: 8),
-              _buildInfoRow(Icons.check_circle, 'Fim', DateFormat('dd/MM/yyyy HH:mm').format(service.endDate!)),
+              _buildInfoRow(Icons.check_circle_outline, 'Fim', DateFormat('dd/MM/yyyy HH:mm').format(service.endDate!)),
             ],
-            const Divider(height: 24),
+            const Divider(height: 24, color: Color(0xFFE0E0E0)),
             if (service.status == 'in_progress')
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _showFinishDialog(context, service),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                  child: const Text('FINALIZAR SERVIÇO', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                ),
+              ElevatedButton(
+                onPressed: () => _showFinishDialog(context, service),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                child: const Text('FINALIZAR SERVIÇO'),
               )
             else if (service.status == 'pending')
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _startService(context, service),
-                  child: const Text('INICIAR SERVIÇO', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                ),
+              ElevatedButton(
+                onPressed: () => _startService(context, service),
+                child: const Text('INICIAR SERVIÇO'),
               ),
           ],
         ),
@@ -131,11 +134,17 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: Colors.grey),
+        Icon(icon, size: 16, color: const Color(0xFF666666)),
         const SizedBox(width: 8),
-        Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-        Expanded(child: Text(value, style: const TextStyle(fontSize: 12))),
+        Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFF666666))),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
+          ),
+        ),
       ],
     );
   }
@@ -171,9 +180,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Finalizar Serviço'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        title: const Text('Finalizar Serviço', style: TextStyle(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Deseja finalizar esta ordem de serviço?'),
             const SizedBox(height: 16),
@@ -181,14 +192,17 @@ class _ServicesScreenState extends State<ServicesScreen> {
               controller: notesController,
               decoration: const InputDecoration(
                 hintText: 'Observações finais...',
-                border: OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCELAR')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            style: TextButton.styleFrom(foregroundColor: const Color(0xFF666666)),
+            child: const Text('CANCELAR'),
+          ),
           ElevatedButton(
             onPressed: () async {
               final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -216,8 +230,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 }
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text('CONFIRMAR', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              minimumSize: const Size(100, 44),
+            ),
+            child: const Text('CONFIRMAR'),
           ),
         ],
       ),

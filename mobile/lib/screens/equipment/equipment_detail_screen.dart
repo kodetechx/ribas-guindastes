@@ -66,19 +66,24 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
     final equipment = widget.equipment;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: Text(equipment.name),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (equipment.imageUrl != null)
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(4),
                     child: Image.network(
                       _apiService.getFullUrl(equipment.imageUrl!),
                       height: 200,
@@ -86,17 +91,21 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (ctx, err, stack) => Container(
                         height: 200,
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: const Color(0xFFE0E0E0)),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Icon(Icons.image_not_supported_outlined, size: 64, color: Colors.grey),
                       ),
                     ),
                   ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Especificações Técnicas',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'ESPECIFICAÇÕES TÉCNICAS',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 _buildInfoCard([
                   _buildDetailRow('Marca', equipment.brand),
                   _buildDetailRow('Modelo', equipment.equipmentModel),
@@ -107,10 +116,10 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
                 ]),
                 const SizedBox(height: 24),
                 const Text(
-                  'Status de Manutenção',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'STATUS DE MANUTENÇÃO',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 _buildInfoCard([
                   _buildDetailRow(
                     'Última Manutenção',
@@ -128,41 +137,38 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
                 ]),
                 const SizedBox(height: 24),
                 const Text(
-                  'Documentos do Equipamento',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'DOCUMENTOS DO EQUIPAMENTO',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 if (documentProvider.isLoading)
                   const Center(child: Padding(padding: EdgeInsets.all(24.0), child: CircularProgressIndicator()))
                 else if (documentProvider.equipmentDocuments.isEmpty)
-                  const Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text('Nenhum documento encontrado para este equipamento.'),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFE0E0E0)),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'Nenhum documento encontrado para este equipamento.',
+                      style: TextStyle(color: Color(0xFF666666), fontSize: 14),
                     ),
                   )
                 else
                   ...documentProvider.equipmentDocuments.map((doc) => _buildDocumentCard(doc)),
-                const SizedBox(height: 40),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ChecklistScreen(selectedEquipment: equipment),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: const Color(0xFF1E3A8A),
-                    ),
-                    child: const Text(
-                      'REALIZAR CHECKLIST',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ChecklistScreen(selectedEquipment: equipment),
+                      ),
+                    );
+                  },
+                  child: const Text('REALIZAR CHECKLIST'),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -184,25 +190,30 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
   }
 
   Widget _buildInfoCard(List<Widget> children) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(children: children),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE0E0E0)),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      child: Column(
+        children: children,
       ),
     );
   }
 
   Widget _buildDetailRow(String label, String value, {Color? color}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+          Text(label, style: const TextStyle(color: Color(0xFF666666), fontSize: 14, fontWeight: FontWeight.w500)),
           Text(
             value,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
               fontSize: 14,
               color: color ?? const Color(0xFF1A1A1A),
             ),
@@ -213,14 +224,33 @@ class _EquipmentDetailScreenState extends State<EquipmentDetailScreen> {
   }
 
   Widget _buildDocumentCard(DocumentModel doc) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE0E0E0)),
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: ListTile(
-        leading: const Icon(Icons.description, color: Color(0xFF1E3A8A), size: 30),
-        title: Text(doc.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-        subtitle: Text(doc.type, style: const TextStyle(fontSize: 12)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF6FF),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: const Icon(Icons.description_outlined, color: Color(0xFF1E3A8A), size: 24),
+        ),
+        title: Text(
+          doc.name,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF1A1A1A)),
+        ),
+        subtitle: Text(
+          doc.type.toUpperCase(),
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF666666)),
+        ),
         trailing: IconButton(
-          icon: const Icon(Icons.remove_red_eye_outlined),
+          icon: const Icon(Icons.visibility_outlined, color: Color(0xFF1E3A8A)),
           onPressed: () => _viewDocument(doc),
         ),
       ),

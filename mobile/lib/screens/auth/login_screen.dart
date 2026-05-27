@@ -69,70 +69,50 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Login Form in a rounded card
+          // Login Form in a flat card
           Positioned(
-            top: size.height * 0.38,
+            top: size.height * 0.40,
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(60),
+                border: Border(
+                  top: BorderSide(color: Color(0xFFE0E0E0), width: 1),
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 15,
-                    offset: Offset(0, -5),
-                  ),
-                ],
               ),
               child: SingleChildScrollView(
                 physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(32.0, 40.0, 32.0, 32.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Center(
+                      Center(
                         child: Text(
-                          'Login',
+                          'Acesso ao Sistema',
                           style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.primary,
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 32),
                       
                       // Email Field
                       TextFormField(
                         controller: _emailController,
-                        style: const TextStyle(fontSize: 18),
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          labelStyle: const TextStyle(color: Colors.grey),
-                          suffixIcon: const Padding(
+                        style: const TextStyle(fontSize: 16, color: Color(0xFF1A1A1A)),
+                        decoration: const InputDecoration(
+                          labelText: 'E-mail corporativo',
+                          suffixIcon: Padding(
                             padding: EdgeInsets.only(right: 12.0),
-                            child: Icon(Icons.person_outline, color: Colors.grey, size: 28),
+                            child: Icon(Icons.mail_outline, color: Color(0xFF666666), size: 22),
                           ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFF1E3A8A), width: 2),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                         ),
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) => value == null || !value.contains('@') ? 'E-mail inválido' : null,
@@ -142,36 +122,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Password Field
                       TextFormField(
                         controller: _passwordController,
-                        style: const TextStyle(fontSize: 18),
+                        style: const TextStyle(fontSize: 16, color: Color(0xFF1A1A1A)),
                         decoration: InputDecoration(
                           labelText: 'Senha',
-                          labelStyle: const TextStyle(color: Colors.grey),
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: IconButton(
                               icon: Icon(
                                 _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                                color: Colors.grey,
-                                size: 28,
+                                color: const Color(0xFF666666),
+                                size: 22,
                               ),
                               onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                             ),
                           ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Color(0xFF1E3A8A), width: 2),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                         ),
-                        obscureText: _obscurePassword,),
+                        obscureText: _obscurePassword,
+                      ),
                       
                       const SizedBox(height: 8),
                       
@@ -184,11 +151,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               MaterialPageRoute(builder: (_) => const RecoveryScreen()),
                             );
                           },
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color(0xFF666666),
+                            padding: EdgeInsets.zero,
+                          ),
                           child: const Text(
                             'Esqueci minha senha',
                             style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -199,15 +170,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Login Button
                       ElevatedButton(
                         onPressed: isLoading ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1E3A8A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 4,
-                        ),
                         child: isLoading
                             ? const SizedBox(
                                 height: 24,
@@ -217,13 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                            : const Text('ENTRAR'),
                       ),
                     ],
                   ),
