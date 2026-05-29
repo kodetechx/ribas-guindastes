@@ -9,6 +9,7 @@ export interface IEquipment extends Document {
   status: 'active' | 'maintenance' | 'blocked';
   qrCode?: string;
   documents: string[];
+  checklistTemplateId?: mongoose.Types.ObjectId;
   lastMaintenance?: Date;
   nextMaintenance?: Date;
   createdAt: Date;
@@ -29,6 +30,7 @@ const EquipmentSchema: Schema = new Schema(
     },
     qrCode: { type: String },
     documents: [{ type: String }],
+    checklistTemplateId: { type: Schema.Types.ObjectId, ref: 'ChecklistTemplate' },
     lastMaintenance: { type: Date },
     nextMaintenance: { type: Date },
     imageUrl: { type: String },

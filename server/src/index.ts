@@ -10,6 +10,9 @@ import statsRoutes from './routes/stats.routes';
 import maintenanceRoutes from './routes/maintenance.routes';
 import documentRoutes from './routes/document.routes';
 import serviceRoutes from './routes/service.routes';
+import clientRoutes from './routes/client.routes';
+import checklistTemplateRoutes from './routes/checklistTemplate.routes';
+import documentTypeRoutes from './routes/documentType.routes';
 import uploadRoutes from './routes/upload.routes';
 import auditLogRoutes from './routes/auditLog.routes';
 
@@ -45,6 +48,9 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/maintenances', maintenanceRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/clients', clientRoutes);
+app.use('/api/checklist-templates', checklistTemplateRoutes);
+app.use('/api/document-types', documentTypeRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/logs', auditLogRoutes);
 

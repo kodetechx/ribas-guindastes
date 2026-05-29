@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IAuditLog extends Document {
   user: mongoose.Types.ObjectId;
   action: string;
-  targetModel: 'Equipment' | 'Operator' | 'Checklist' | 'Maintenance' | 'Service';
+  targetModel: 'Equipment' | 'Operator' | 'Checklist' | 'Maintenance' | 'Service' | 'Client' | 'ChecklistTemplate' | 'DocumentType';
   targetId: mongoose.Types.ObjectId;
   details: any;
   createdAt: Date;
@@ -12,7 +12,11 @@ export interface IAuditLog extends Document {
 const AuditLogSchema: Schema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'Operator', required: true },
   action: { type: String, required: true }, // ex: 'UPDATE', 'CREATE', 'DELETE'
-  targetModel: { type: String, enum: ['Equipment', 'Operator', 'Checklist', 'Maintenance', 'Service'], required: true },
+  targetModel: { 
+    type: String, 
+    enum: ['Equipment', 'Operator', 'Checklist', 'Maintenance', 'Service', 'Client', 'ChecklistTemplate', 'DocumentType'], 
+    required: true 
+  },
   targetId: { type: Schema.Types.ObjectId, required: true },
   details: { type: Schema.Types.Mixed },
 }, { timestamps: { createdAt: true, updatedAt: false } });

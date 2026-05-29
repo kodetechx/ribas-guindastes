@@ -8,6 +8,7 @@ import OperatorDetail from './pages/OperatorDetail';
 import ChecklistExecution from './pages/ChecklistExecution';
 import MyDocuments from './pages/MyDocuments';
 import ServicesList from './pages/ServicesList';
+import Settings from './pages/Settings';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -71,6 +72,14 @@ function App() {
             <ProtectedRoute roles={['admin', 'manager']}>
               <Layout>
                 <ServicesList />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/configuracoes" element={
+            <ProtectedRoute roles={['admin', 'manager']}>
+              <Layout>
+                <Settings />
               </Layout>
             </ProtectedRoute>
           } />

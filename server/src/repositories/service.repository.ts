@@ -2,11 +2,11 @@ import Service, { IService } from '../models/Service';
 
 export class ServiceRepository {
   async findAll() {
-    return await Service.find().populate('equipment').populate('operators');
+    return await Service.find().populate('clientId').populate('equipment').populate('operators');
   }
 
   async findByOperator(operatorId: string) {
-    return await Service.find({ operators: operatorId }).populate('equipment').populate('operators').sort({ createdAt: -1 });
+    return await Service.find({ operators: operatorId }).populate('clientId').populate('equipment').populate('operators').sort({ createdAt: -1 });
   }
 
   async findActiveByEquipment(equipmentId: string) {

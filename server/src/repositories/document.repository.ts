@@ -1,8 +1,13 @@
+import mongoose from 'mongoose';
 import Document, { IDocument } from '../models/Document';
 
 export class DocumentRepository {
-  async findAllByOwner(ownerId: string, category: 'operator' | 'equipment') {
+  async findAllByOwner(ownerId: string | mongoose.Types.ObjectId, category: 'operator' | 'equipment') {
     return await Document.find({ ownerId, category });
+  }
+
+  async findByOwner(ownerId: string | mongoose.Types.ObjectId) {
+    return await Document.find({ ownerId });
   }
 
   async create(data: Partial<IDocument>) {

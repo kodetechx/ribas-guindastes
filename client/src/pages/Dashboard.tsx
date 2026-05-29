@@ -41,25 +41,25 @@ const Dashboard = () => {
 
   const statCards = [
     { 
-      label: 'Equipamentos Ativos', 
-      value: stats?.equipments?.active || 0, 
-      icon: Truck, 
+      label: 'Serviços em Andamento', 
+      value: stats?.services?.inProgress || 0, 
+      icon: Clock, 
       color: 'text-blue-900', 
       bg: 'bg-blue-50' 
     },
     { 
-      label: 'Manutenções Pendentes', 
-      value: stats?.alerts?.upcomingMaintenances?.length || 0, 
-      icon: Clock, 
-      color: 'text-yellow-700', 
-      bg: 'bg-yellow-50' 
+      label: 'Equipamentos em Uso', 
+      value: `${stats?.equipments?.inUse || 0}/${stats?.equipments?.active || 0}`, 
+      icon: Truck, 
+      color: 'text-blue-700', 
+      bg: 'bg-blue-50' 
     },
     { 
-      label: 'Documentos Vencendo', 
-      value: stats?.alerts?.documentAlerts?.length || 0, 
-      icon: FileWarning, 
-      color: 'text-orange-700', 
-      bg: 'bg-orange-50' 
+      label: 'Operadores em Uso', 
+      value: `${stats?.operators?.inUse || 0}/${stats?.operators?.total || 0}`, 
+      icon: User, 
+      color: 'text-blue-800', 
+      bg: 'bg-blue-50' 
     },
     { 
       label: 'Checklists Hoje', 

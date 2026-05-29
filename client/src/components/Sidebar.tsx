@@ -1,4 +1,4 @@
-import { LayoutDashboard, Truck, Users, FileText, LogOut, FileBadge } from 'lucide-react';
+import { LayoutDashboard, Truck, Users, FileText, LogOut, FileBadge, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,6 +12,7 @@ const Sidebar = () => {
     { icon: Users, label: 'Operadores', path: '/operadores', roles: ['admin', 'manager'] },
     { icon: FileBadge, label: 'Meus Documentos', path: '/meus-documentos', roles: ['operator'] },
     { icon: FileText, label: 'Serviços', path: '/servicos', roles: ['admin', 'manager'] },
+    { icon: Settings, label: 'Configurações', path: '/configuracoes', roles: ['admin', 'manager'] },
   ];
 
   const filteredItems = menuItems.filter(item => !item.roles || (user && item.roles.includes(user.role)));

@@ -69,7 +69,7 @@ export class ServiceService {
     const service = await repository.create(data);
 
     if (userId) {
-      await auditLog.log(userId, 'CREATE', 'Service', service._id.toString(), { title: service.title, client: service.client });
+      await auditLog.log(userId, 'CREATE', 'Service', service._id.toString(), { title: service.title, clientId: service.clientId });
     }
 
     return service;

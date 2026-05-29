@@ -9,5 +9,7 @@ router.get('/', protect, authorize('admin', 'manager'), controller.getAll);
 router.get('/operator/:operatorId', protect, controller.getByOperator);
 router.post('/', protect, controller.create);
 router.put('/:id', protect, controller.update);
+router.post('/validate-equipment', protect, authorize('admin', 'manager'), controller.validateEquipment);
+router.post('/validate-operator', protect, authorize('admin', 'manager'), controller.validateOperator);
 
 export default router;

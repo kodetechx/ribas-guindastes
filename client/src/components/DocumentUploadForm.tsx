@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, FileText } from 'lucide-react';
 import api from '../services/api';
 
@@ -13,12 +13,30 @@ interface Props {
 const DocumentUploadForm: React.FC<Props> = ({ initialData, ownerId, category, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
-    type: initialData?.type || 'Certificado',
+    type: initialData?.type || '',
     expiresAt: initialData?.expiresAt ? new Date(initialData.expiresAt).toISOString().split('T')[0] : '',
   });
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [documentTypes, setDocumentTypes] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchDocTypes = async () => {
+      try {
+        const res = await api.get('/document-types/active');
+        // Filter by category if needed, or show all
+        const filtered = res.data.filter((t: any) => t.category === 'both' || t.category === category);
+        setDocumentTypes(filtered);
+        if (!formData.type && filtered.length > 0) {
+          setFormData(prev => ({ ...prev, type: filtered[0].name }));
+        }
+      } catch (err) {
+        console.error('Erro ao buscar tipos de documentos');
+      }
+    };
+    fetchDocTypes();
+  }, [category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,17 +121,13 @@ const DocumentUploadForm: React.FC<Props> = ({ initialData, ownerId, category, o
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Tipo</label>
               <select
-                className="w-full border border-gray-200 rounded-sm p-2 text-sm focus:outline-none focus:border-blue-900"
+                className="w-full border border-gray-200 rounded-sm p-2 text-sm focus:outline-none focus:border-blue-900 font-bold uppercase"
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               >
-                <option value="CNH">CNH</option>
-                <option value="Certificação NR-11">NR-11</option>
-                <option value="Certificação NR-12">NR-12</option>
-                <option value="Certificação NR-35">NR-35</option>
-                <option value="Documento do Veículo">Doc. Veículo</option>
-                <option value="Certificado">Certificado Geral</option>
-                <option value="Manual">Manual Técnico</option>
+                {documentTypes.map((t: any) => (
+                  <option key={t._id} value={t.name}>{t.name}</option>
+                ))}
               </select>
             </div>
             <div>

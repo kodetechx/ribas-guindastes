@@ -4,6 +4,7 @@ import Operator from '../models/Operator';
 import Checklist from '../models/Checklist';
 import Maintenance from '../models/Maintenance';
 import DocumentModel from '../models/Document';
+import Service from '../models/Service';
 
 export class StatsController {
   public async getDashboardStats(req: Request, res: Response): Promise<void> {
@@ -14,6 +15,15 @@ export class StatsController {
       const blockedEquipments = await Equipment.countDocuments({ status: 'blocked' });
 
       const totalOperators = await Operator.countDocuments({ isActive: true });
+
+      // Service Stats
+      const servicesInProgressCount = await Service.countDocuments({ status: 'in_progress' });
+      const servicesFinishedCount = await Service.countDocuments({ status: 'finished' });
+      const servicesPendingCount = await Service.countDocuments({ status: 'pending' });
+
+      const servicesInProgress = await Service.find({ status: 'in_progress' });
+      const equipmentsInUse = new Set(servicesInProgress.map(s => s.equipment.toString())).size;
+      const operatorsInUse = new Set(servicesInProgress.flatMap(s => s.operators.map(o => o.toString()))).size;
 
       // Checklists today
       const start = new Date();
@@ -112,8 +122,22 @@ export class StatsController {
       }));
 
       res.status(200).json({
-        equipments: { total: totalEquipments, active: activeEquipments, maintenance: maintenanceEquipments, blocked: blockedEquipments },
-        operators: { total: totalOperators },
+        equipments: { 
+          total: totalEquipments, 
+          active: activeEquipments, 
+          maintenance: maintenanceEquipments, 
+          blocked: blockedEquipments,
+          inUse: equipmentsInUse
+        },
+        operators: { 
+          total: totalOperators,
+          inUse: operatorsInUse
+        },
+        services: {
+          inProgress: servicesInProgressCount,
+          finished: servicesFinishedCount,
+          pending: servicesPendingCount
+        },
         checklists: { today: checklistsToday, recent: recentChecklists },
         alerts: { upcomingMaintenances, documentAlerts },
         charts: { utilization, costs }
