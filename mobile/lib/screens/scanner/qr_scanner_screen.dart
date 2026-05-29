@@ -18,6 +18,10 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         title: const Text('Escanear QR Code'),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Stack(
         children: [
@@ -39,22 +43,28 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           ),
           Center(
             child: Container(
-              width: 250,
-              height: 250,
+              width: 240,
+              height: 240,
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.white, width: 2),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             bottom: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                'Aponte para o QR Code do equipamento',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            left: 24,
+            right: 24,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+              ),
+              child: const Text(
+                'Aponte a câmera para o QR Code do equipamento',
+                style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.2),
+                textAlign: TextAlign.center,
               ),
             ),
           ),

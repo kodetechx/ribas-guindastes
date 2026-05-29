@@ -181,19 +181,18 @@ class _HomeTabState extends State<HomeTab> {
     final expiredCount = documentProvider.operatorDocuments.where((doc) => doc.status == 'expired').length;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5), // Light background for grid/cards
       appBar: AppBar(
         title: const Text('Painel do Operador'),
-        backgroundColor: const Color(0xFF1E3A8A),
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.qr_code_scanner),
+            icon: const Icon(Icons.qr_code_scanner_outlined, color: Colors.white),
             onPressed: () => _scanQrCode(context),
           ),
           if (!_isOnline)
             const Padding(
               padding: EdgeInsets.only(right: 16.0),
-              child: Icon(Icons.cloud_off, color: Colors.orangeAccent),
+              child: Icon(Icons.wifi_off_outlined, color: Colors.orangeAccent),
             ),
         ],
       ),
@@ -202,12 +201,24 @@ class _HomeTabState extends State<HomeTab> {
           if (!_isOnline)
             Container(
               width: double.infinity,
-              color: Colors.orange.shade100,
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              child: const Text(
-                'Você está em modo offline. Algumas funções podem estar limitadas.',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+              color: Colors.orange.shade50,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.orangeAccent, width: 1),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.wifi_off_outlined, color: Colors.orange, size: 16),
+                  SizedBox(width: 8),
+                  Text(
+                    'Modo Offline. Algumas funções estão limitadas.',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.orange),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
           Expanded(
@@ -219,47 +230,65 @@ class _HomeTabState extends State<HomeTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: user?.photoUrl != null 
-                              ? NetworkImage(_apiService.getFullUrl(user!.photoUrl!)) 
-                              : null,
-                          child: user?.photoUrl == null ? const Icon(Icons.person, color: Colors.grey, size: 30) : null,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            'Olá, ${user?.name ?? 'Operador'}!',
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    // Profile section in a clean container
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: const Color(0xFFE0E0E0),
+                            backgroundImage: user?.photoUrl != null 
+                                ? NetworkImage(_apiService.getFullUrl(user!.photoUrl!)) 
+                                : null,
+                            child: user?.photoUrl == null ? const Icon(Icons.person_outline, color: Color(0xFF666666), size: 28) : null,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Olá, ${user?.name ?? 'Operador'}',
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF1A1A1A)),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  user?.email ?? '',
+                                  style: const TextStyle(fontSize: 13, color: Color(0xFF666666)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
+                    
+                    // Grid of actions
                     GridView.count(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 1.25,
                       children: [
                         _buildQuickAction(
                           context,
-                          'Escanear QR Code',
-                          Icons.qr_code_scanner,
-                          Colors.blue.shade100,
-                          const Color.fromARGB(255, 0, 0, 0),
+                          'Escanear QR',
+                          Icons.qr_code_scanner_outlined,
                           () => _scanQrCode(context),
                         ),
                         _buildQuickAction(
                           context,
-                          'Realizar Checklist',
-                          Icons.checklist,
-                          Colors.blue.shade100,
-                          Colors.black,
+                          'Checklist',
+                          Icons.assignment_outlined,
                           () {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) => const ChecklistScreen()),
@@ -268,10 +297,8 @@ class _HomeTabState extends State<HomeTab> {
                         ),
                         _buildQuickAction(
                           context,
-                          'Consultar Documentos',
-                          Icons.description,
-                          Colors.blue.shade100,
-                          Colors.black,
+                          'Documentos',
+                          Icons.description_outlined,
                           () {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
@@ -280,10 +307,8 @@ class _HomeTabState extends State<HomeTab> {
                         ),
                         _buildQuickAction(
                           context,
-                          'Ordens de Serviço',
-                          Icons.assignment,
-                          Colors.blue.shade100,
-                          Colors.black,
+                          'Serviços',
+                          Icons.build_outlined,
                           () {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) => const ServicesScreen()),
@@ -292,115 +317,107 @@ class _HomeTabState extends State<HomeTab> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
                     const Text(
-                      'Status Atual',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      'STATUS DA OPERAÇÃO',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
                     ),
-                    const SizedBox(height: 12),
-                    if (workProvider.activeService != null)
-                      Card(
-                        color: Colors.blue.shade50,
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.blue,
-                            child: Icon(Icons.play_arrow, color: Colors.white),
-                          ),
-                          title: const Text('Serviço em Andamento'),
-                          subtitle: Text(workProvider.activeService!.title),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const ServicesScreen()),
-                            );
-                          },
-                        ),
+                    const SizedBox(height: 10),
+                    
+                    // Active service
+                    if (workProvider.activeService != null) ...[
+                      _buildStatusCard(
+                        context,
+                        title: 'Serviço em Andamento',
+                        subtitle: workProvider.activeService!.title,
+                        icon: Icons.play_circle_outline,
+                        iconColor: const Color(0xFF1E3A8A),
+                        borderColor: const Color(0xFF1E3A8A),
+                        bgColor: const Color(0xFFEFF6FF),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const ServicesScreen()),
+                          );
+                        },
                       ),
+                      const SizedBox(height: 10),
+                    ],
+                    
+                    // Checklist Status
                     if (_todayChecklist != null)
-                      Card(
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: _todayChecklist!['isLocal'] == true ? Colors.orange : Colors.green,
-                            child: Icon(_todayChecklist!['isLocal'] == true ? Icons.cloud_upload : Icons.check, color: Colors.white),
-                          ),
-                          title: Text(_todayChecklist!['isLocal'] == true ? 'Checklist Salvo (Local)' : 'Checklist do Dia'),
-                          subtitle: Text(_todayChecklist!['isLocal'] == true 
-                            ? 'Aguardando sincronização...' 
-                            : 'Realizado hoje às ${DateFormat('HH:mm').format(DateTime.parse(_todayChecklist!['createdAt']))}'),
-                          trailing: const Icon(Icons.chevron_right),
-                        ),
+                      _buildStatusCard(
+                        context,
+                        title: _todayChecklist!['isLocal'] == true ? 'Checklist Salvo (Local)' : 'Checklist Realizado',
+                        subtitle: _todayChecklist!['isLocal'] == true 
+                            ? 'Aguardando conexão para sincronização...' 
+                            : 'Realizado hoje às ${DateFormat('HH:mm').format(DateTime.parse(_todayChecklist!['createdAt']))}',
+                        icon: _todayChecklist!['isLocal'] == true ? Icons.cloud_upload_outlined : Icons.check_circle_outline,
+                        iconColor: _todayChecklist!['isLocal'] == true ? Colors.orange : Colors.green,
+                        borderColor: _todayChecklist!['isLocal'] == true ? Colors.orange.shade300 : Colors.green.shade300,
+                        bgColor: _todayChecklist!['isLocal'] == true ? Colors.orange.shade50 : Colors.green.shade50,
                       )
                     else
-                      Card(
-                        color: Colors.red.shade50,
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.red,
-                            child: Icon(Icons.warning, color: Colors.white),
-                          ),
-                          title: const Text('Checklist não realizado'),
-                          subtitle: const Text('Obrigatório para iniciar operação'),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const ChecklistScreen()),
-                            );
-                          },
-                        ),
+                      _buildStatusCard(
+                        context,
+                        title: 'Checklist não realizado',
+                        subtitle: 'Obrigatório para iniciar a operação',
+                        icon: Icons.error_outline,
+                        iconColor: Colors.red,
+                        borderColor: Colors.red.shade300,
+                        bgColor: Colors.red.shade50,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const ChecklistScreen()),
+                          );
+                        },
                       ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
+
+                    // Document Status
                     if (expiredCount > 0)
-                      Card(
-                        color: Colors.red.shade50,
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.red,
-                            child: Icon(Icons.error_outline, color: Colors.white),
-                          ),
-                          title: Text('$expiredCount Documento(s) Vencido(s)'),
-                          subtitle: const Text('Regularize sua situação imediatamente'),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
-                            );
-                          },
-                        ),
+                      _buildStatusCard(
+                        context,
+                        title: '$expiredCount Documento(s) Vencido(s)',
+                        subtitle: 'Regularize sua situação imediatamente',
+                        icon: Icons.cancel_outlined,
+                        iconColor: Colors.red,
+                        borderColor: Colors.red.shade300,
+                        bgColor: Colors.red.shade50,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
+                          );
+                        },
                       )
                     else if (expiringCount > 0)
-                      Card(
-                        color: Colors.orange.shade50,
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.orange,
-                            child: Icon(Icons.warning_amber, color: Colors.white),
-                          ),
-                          title: Text('$expiringCount Documento(s) Vencendo'),
-                          subtitle: const Text('Fique atento aos prazos de renovação'),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
-                            );
-                          },
-                        ),
+                      _buildStatusCard(
+                        context,
+                        title: '$expiringCount Documento(s) Vencendo',
+                        subtitle: 'Fique atento aos prazos de renovação',
+                        icon: Icons.warning_amber_outlined,
+                        iconColor: Colors.orange,
+                        borderColor: Colors.orange.shade300,
+                        bgColor: Colors.orange.shade50,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
+                          );
+                        },
                       )
                     else
-                      Card(
-                        child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Colors.green,
-                            child: Icon(Icons.verified, color: Colors.white),
-                          ),
-                          title: const Text('Documentação Regular'),
-                          subtitle: const Text('Todos os seus documentos estão válidos'),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
-                            );
-                          },
-                        ),
+                      _buildStatusCard(
+                        context,
+                        title: 'Documentação Regular',
+                        subtitle: 'Todos os seus certificados estão válidos',
+                        icon: Icons.verified_outlined,
+                        iconColor: Colors.green,
+                        borderColor: Colors.green.shade300,
+                        bgColor: Colors.green.shade50,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const DocumentsListScreen()),
+                          );
+                        },
                       ),
                   ],
                 ),
@@ -412,26 +429,75 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  Widget _buildQuickAction(BuildContext context, String title, IconData icon, Color bgColor, Color iconColor, VoidCallback onTap) {
+  Widget _buildQuickAction(BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(4),
       child: Container(
         decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+          borderRadius: BorderRadius.circular(4),
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: iconColor),
-            const SizedBox(height: 12),
+            Icon(icon, size: 32, color: const Color(0xFF1E3A8A)),
+            const SizedBox(height: 10),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF1A1A1A)),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color iconColor,
+    required Color borderColor,
+    required Color bgColor,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border.all(color: borderColor, width: 1),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: iconColor, size: 24),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: iconColor),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: iconColor.withValues(alpha: 0.8)),
+                  ),
+                ],
+              ),
+            ),
+            if (onTap != null)
+              Icon(Icons.chevron_right, color: iconColor, size: 20),
           ],
         ),
       ),

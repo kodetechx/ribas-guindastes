@@ -55,28 +55,86 @@ class MyApp extends StatelessWidget {
             foregroundColor: Colors.white,
             elevation: 0,
             centerTitle: true,
+            titleTextStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: 0.5,
+            ),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E3A8A),
               foregroundColor: Colors.white,
+              minimumSize: const Size.fromHeight(54), // Botões altos para uso com luvas
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
               elevation: 0,
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF1E3A8A),
+              side: const BorderSide(color: Color(0xFF1E3A8A), width: 1.5),
+              minimumSize: const Size.fromHeight(54),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              elevation: 0,
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
           cardTheme: CardThemeData(
             elevation: 0,
+            margin: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               side: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
               borderRadius: BorderRadius.circular(4),
             ),
             color: Colors.white,
           ),
-          textTheme: GoogleFonts.robotoTextTheme().copyWith(
-            titleLarge: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.bold),
-            bodyMedium: const TextStyle(color: Color(0xFF1A1A1A)),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: Color(0xFFCCCCCC), width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: Color(0xFF1E3A8A), width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(4),
+              borderSide: const BorderSide(color: Colors.red, width: 2),
+            ),
+            labelStyle: const TextStyle(color: Color(0xFF666666), fontSize: 15),
+            floatingLabelStyle: const TextStyle(color: Color(0xFF1E3A8A), fontSize: 14),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          ),
+          textTheme: GoogleFonts.interTextTheme().copyWith(
+            titleLarge: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w700, fontSize: 20),
+            titleMedium: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w600, fontSize: 16),
+            bodyLarge: const TextStyle(color: Color(0xFF1A1A1A), fontSize: 15),
+            bodyMedium: const TextStyle(color: Color(0xFF333333), fontSize: 14),
           ),
         ),
         home: const AuthWrapper(),

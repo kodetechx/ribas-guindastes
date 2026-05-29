@@ -16,60 +16,44 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Recuperar Senha'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 20),
-            const Text(
-              'Recuperar',
+            Text(
+              'Recuperar Acesso',
               style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.w400,
-                color: Colors.black87,
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.primary,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             const Text(
               'Digite seu e-mail cadastrado para receber o link de redefinição.',
-              style: TextStyle(color: Colors.grey, fontSize: 16),
+              style: TextStyle(color: Color(0xFF666666), fontSize: 15),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             
             // Email Field
             TextField(
               controller: _emailController,
-              style: const TextStyle(fontSize: 18),
-              decoration: InputDecoration(
-                labelText: 'Email',
-                labelStyle: const TextStyle(color: Colors.grey),
-                suffixIcon: const Padding(
+              style: const TextStyle(fontSize: 16, color: Color(0xFF1A1A1A)),
+              decoration: const InputDecoration(
+                labelText: 'E-mail cadastrado',
+                suffixIcon: Padding(
                   padding: EdgeInsets.only(right: 12.0),
-                  child: Icon(Icons.email_outlined, color: Colors.grey, size: 28),
+                  child: Icon(Icons.mail_outline, color: Color(0xFF666666), size: 22),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFF1E3A8A), width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -80,22 +64,7 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
               onPressed: () {
                 setState(() => _isSent = true);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E3A8A),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 4,
-              ),
-              child: const Text(
-                'Enviar Link',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: const Text('ENVIAR LINK'),
             ),
             
             if (_isSent) ...[
@@ -104,17 +73,17 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.shade200),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.green.shade300, width: 1),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle_outline, color: Colors.green.shade700),
+                    Icon(Icons.check_circle_outline, color: Colors.green.shade700, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'Se o e-mail estiver cadastrado, você receberá o link em breve.',
-                        style: TextStyle(color: Colors.green.shade800),
+                        style: TextStyle(color: Colors.green.shade800, fontSize: 14),
                       ),
                     ),
                   ],
@@ -122,17 +91,19 @@ class _RecoveryScreenState extends State<RecoveryScreen> {
               ),
             ],
             
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             
             // Back to Login Button
             TextButton(
               onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF666666),
+              ),
               child: const Text(
                 'Voltar para o Login',
                 style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  decoration: TextDecoration.underline,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

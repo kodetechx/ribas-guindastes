@@ -80,8 +80,13 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
     ).toList();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text('Meus Documentos'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Stack(
         children: [
@@ -90,59 +95,73 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
               : RefreshIndicator(
                   onRefresh: () => documentProvider.fetchDocuments(user.id, 'operator'),
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Certificações NRs',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          'CERTIFICAÇÕES NRS',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         if (nrs.isEmpty)
-                          const Card(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text('Nenhuma certificação NR registrada.'),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: const Color(0xFFE0E0E0)),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'Nenhuma certificação NR registrada.',
+                              style: TextStyle(color: Color(0xFF666666), fontSize: 14),
                             ),
                           )
                         else
                           ...nrs.map((doc) => _buildDocumentCard(
                                 context,
                                 doc,
-                                Icons.security,
+                                Icons.security_outlined,
                               )),
                         const SizedBox(height: 24),
                         const Text(
-                          'Habilitação',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          'HABILITAÇÃO',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         if (cnh != null)
                           _buildDocumentCard(
                             context,
                             cnh,
-                            Icons.drive_eta,
+                            Icons.badge_outlined,
                           )
                         else
-                          const Card(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text('Informação de CNH não encontrada.'),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: const Color(0xFFE0E0E0)),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'Informação de CNH não encontrada.',
+                              style: TextStyle(color: Color(0xFF666666), fontSize: 14),
                             ),
                           ),
                         if (others.isNotEmpty) ...[
                           const SizedBox(height: 24),
                           const Text(
-                            'Outros Documentos',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            'OUTROS DOCUMENTOS',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           ...others.map((doc) => _buildDocumentCard(
                                 context,
                                 doc,
-                                Icons.description,
+                                Icons.description_outlined,
                               )),
                         ],
                       ],
@@ -177,24 +196,54 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
       statusText = 'Vencendo em breve';
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE0E0E0)),
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: ListTile(
-        leading: Icon(icon, color: statusColor, size: 30),
-        title: Text(doc.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (expiresAt != null)
-              Text('Vencimento: ${DateFormat('dd/MM/yyyy').format(expiresAt)}'),
-            Text(
-              statusText,
-              style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 12),
-            ),
-          ],
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: statusColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Icon(icon, color: statusColor, size: 24),
+        ),
+        title: Text(
+          doc.name,
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF1A1A1A)),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (expiresAt != null)
+                Text(
+                  'Vencimento: ${DateFormat('dd/MM/yyyy').format(expiresAt)}',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF666666)),
+                ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Text(
+                  statusText.toUpperCase(),
+                  style: TextStyle(color: statusColor, fontWeight: FontWeight.w700, fontSize: 10, letterSpacing: 0.5),
+                ),
+              ),
+            ],
+          ),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.remove_red_eye_outlined),
+          icon: const Icon(Icons.visibility_outlined, color: Color(0xFF1E3A8A)),
           onPressed: () => _viewDocument(doc),
         ),
       ),

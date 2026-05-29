@@ -256,103 +256,132 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     final equipments = Provider.of<EquipmentProvider>(context).equipments;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text('Checklist Diário'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Equipamento', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<Equipment>(
-              value: _currentEquipment,
-              isExpanded: true,
-              items: equipments.map((e) {
-                return DropdownMenuItem(
-                  value: e,
-                  child: Text(e.name),
-                );
-              }).toList(),
-              onChanged: (val) => setState(() => _currentEquipment = val),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
-                enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                fillColor: Colors.white,
-                filled: true,
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: const Color(0xFFE0E0E0)),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('EQUIPAMENTO', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: Color(0xFF666666))),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<Equipment>(
+                    value: _currentEquipment,
+                    isExpanded: true,
+                    items: equipments.map((e) {
+                      return DropdownMenuItem(
+                        value: e,
+                        child: Text(e.name, style: const TextStyle(fontSize: 15)),
+                      );
+                    }).toList(),
+                    onChanged: (val) => setState(() => _currentEquipment = val),
+                    decoration: const InputDecoration(
+                      labelText: 'Selecione o Equipamento',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Data e Hora:', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: Color(0xFF666666))),
+                      Text(
+                        DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now()),
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF1A1A1A)),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Data e Hora:', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
-                Text(DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now()), style: TextStyle(color: Colors.grey.shade700)),
-              ],
+            const SizedBox(height: 20),
+            const Text(
+              'ITENS DE INSPEÇÃO',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
             ),
-            const Divider(height: 32, color: Color(0xFFE0E0E0)),
-            const Text('Itens de Inspeção', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _checkItems.length,
               itemBuilder: (ctx, index) {
                 final item = _checkItems[index];
-                return Card(
+                return Container(
                   margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Expanded(
-                              child: Text(item['label'], style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                              child: Text(
+                                item['label'],
+                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF1A1A1A)),
+                              ),
                             ),
                             if (item['hasPhoto'])
                               IconButton(
                                 icon: Icon(
-                                  item['photo'] != null ? Icons.check_circle : Icons.camera_alt,
-                                  color: item['photo'] != null ? Colors.green : Colors.grey,
-                                  size: 20,
+                                  item['photo'] != null ? Icons.check_circle_outline : Icons.photo_camera_outlined,
+                                  color: item['photo'] != null ? Colors.green : const Color(0xFF666666),
+                                  size: 22,
                                 ),
                                 onPressed: () => _pickImage(index),
                               ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
                         Row(
                           children: [
-                            _buildStatusOption(index, 'ok', Icons.check, Colors.green),
+                            _buildStatusOption(index, 'ok', Icons.check_circle_outlined, Colors.green),
                             const SizedBox(width: 8),
-                            _buildStatusOption(index, 'not_ok', Icons.close, Colors.red),
+                            _buildStatusOption(index, 'not_ok', Icons.cancel_outlined, Colors.red),
                             const SizedBox(width: 8),
-                            _buildStatusOption(index, 'na', null, Colors.blue, label: 'N/A'),
+                            _buildStatusOption(index, 'na', null, Colors.grey, label: 'N/A'),
                           ],
                         ),
                         if (item['status'] == 'not_ok') ...[
                           const SizedBox(height: 12),
                           TextField(
                             controller: item['controller'],
+                            style: const TextStyle(fontSize: 14),
                             decoration: const InputDecoration(
                               hintText: 'Descreva o problema...',
-                              hintStyle: TextStyle(fontSize: 12),
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              hintStyle: TextStyle(fontSize: 13, color: Color(0xFF999999)),
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             ),
                           ),
                         ],
                         if (item['photo'] != null) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: Image.file(
                               item['photo'] as File,
-                              height: 100,
+                              height: 120,
                               width: double.infinity,
                               fit: BoxFit.cover,
                             ),
@@ -364,31 +393,36 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 );
               },
             ),
-            const SizedBox(height: 24),
-            const Text('Observações Gerais', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
+            const Text(
+              'OBSERVAÇÕES GERAIS',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
+            ),
+            const SizedBox(height: 10),
             TextField(
               controller: _notesController,
               maxLines: 3,
+              style: const TextStyle(fontSize: 14),
               decoration: const InputDecoration(
-                border: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFE0E0E0))),
                 hintText: 'Alguma observação adicional?',
-                fillColor: Colors.white,
-                filled: true,
+                hintStyle: TextStyle(fontSize: 13, color: Color(0xFF999999)),
               ),
             ),
-            const SizedBox(height: 24),
-            const Text('Assinatura do Operador', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
+            const Text(
+              'ASSINATURA DO OPERADOR',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
+            ),
+            const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFE0E0E0)),
+                border: Border.all(color: const Color(0xFFCCCCCC)),
                 borderRadius: BorderRadius.circular(4),
+                color: Colors.white,
               ),
               child: Signature(
                 controller: _signatureController,
-                height: 150,
+                height: 120,
                 backgroundColor: Colors.white,
               ),
             ),
@@ -397,11 +431,12 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               children: [
                 TextButton(
                   onPressed: () => _signatureController.clear(),
-                  child: const Text('Limpar Assinatura', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: const Text('Limpar Assinatura', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             if (_checkItems.any((i) => i['status'] == 'not_ok')) ...[
               Container(
                 padding: const EdgeInsets.all(12),
@@ -412,7 +447,7 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                    const Icon(Icons.warning_amber_outlined, color: Colors.red),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -431,18 +466,11 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               ),
               const SizedBox(height: 24),
             ],
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _submit,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: const Color(0xFF1E3A8A),
-                ),
-                child: const Text('FINALIZAR E ENVIAR CHECKLIST', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-              ),
+            ElevatedButton(
+              onPressed: _submit,
+              child: const Text('FINALIZAR E ENVIAR CHECKLIST'),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -455,17 +483,25 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
       child: InkWell(
         onTap: () => setState(() => _checkItems[index]['status'] = status),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          height: 40,
           decoration: BoxDecoration(
-            color: isSelected ? color : Colors.grey.shade100,
-            border: Border.all(color: isSelected ? color : Colors.grey.shade300),
+            color: isSelected ? color : Colors.white,
+            border: Border.all(color: isSelected ? color : const Color(0xFFCCCCCC)),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) Icon(icon, color: isSelected ? Colors.white : color, size: 16),
-              if (label != null) Text(label, style: TextStyle(color: isSelected ? Colors.white : color, fontWeight: FontWeight.bold, fontSize: 12)),
+              if (label != null)
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : color,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
             ],
           ),
         ),
