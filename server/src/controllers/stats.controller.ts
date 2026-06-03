@@ -22,7 +22,7 @@ export class StatsController {
       const servicesPendingCount = await Service.countDocuments({ status: 'pending' });
 
       const servicesInProgress = await Service.find({ status: 'in_progress' });
-      const equipmentsInUse = new Set(servicesInProgress.map(s => s.equipment.toString())).size;
+      const equipmentsInUse = new Set(servicesInProgress.flatMap(s => s.equipments.map(e => e.toString()))).size;
       const operatorsInUse = new Set(servicesInProgress.flatMap(s => s.operators.map(o => o.toString()))).size;
 
       // Checklists today
@@ -48,7 +48,7 @@ export class StatsController {
       
       const upcomingMaintenances = await Equipment.find({
         nextMaintenance: { $lte: nextMonthLimit, $gte: now }
-      }).select('name nextMaintenance');
+      }).select('_id name nextMaintenance');
 
       // 1. Alertas de Operadores (NRs)
       const expiringNRs = await Operator.find({
@@ -58,10 +58,12 @@ export class StatsController {
       const operatorAlerts = expiringNRs.flatMap(op => 
         op.nrs.filter(nr => nr.expiresAt <= nextMonthLimit)
           .map(nr => ({
+            id: op._id,
             name: op.name,
             docType: nr.type,
             expiresAt: nr.expiresAt,
-            status: nr.expiresAt < now ? 'expired' : 'warning'
+            status: nr.expiresAt < now ? 'expired' : 'warning',
+            category: 'operator'
           }))
       );
 
@@ -84,10 +86,12 @@ export class StatsController {
       docEquipments.forEach(e => ownerMap.set(e._id.toString(), e.name));
 
       const generalAlerts = expiringGeneralDocs.map(doc => ({
+        id: doc.ownerId,
         name: ownerMap.get(doc.ownerId.toString()) || 'N/A',
         docType: doc.name,
         expiresAt: doc.expiresAt,
-        status: doc.status
+        status: doc.status,
+        category: doc.category
       }));
 
       const documentAlerts = [...operatorAlerts, ...generalAlerts];

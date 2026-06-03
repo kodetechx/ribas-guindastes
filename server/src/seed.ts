@@ -154,6 +154,9 @@ const seedDB = async () => {
         category: 'equipment',
         ownerId: equipments[0]._id,
         fileUrl: 'uploads/mock-laudo.pdf',
+        fileName: 'mock-laudo.pdf',
+        mimeType: 'application/pdf',
+        size: 1024 * 500, // 500KB
         expiresAt: new Date(2027, 0, 1),
         status: 'valid'
       },
@@ -163,6 +166,9 @@ const seedDB = async () => {
         category: 'equipment',
         ownerId: equipments[1]._id,
         fileUrl: 'uploads/mock-art.pdf',
+        fileName: 'mock-art.pdf',
+        mimeType: 'application/pdf',
+        size: 1024 * 300, // 300KB
         expiresAt: new Date(2026, 10, 1),
         status: 'valid'
       }

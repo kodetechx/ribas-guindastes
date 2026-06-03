@@ -16,33 +16,39 @@ export class ServiceService {
     return await repository.findAll();
   }
 
+  async getServiceById(id: string) {
+    return await repository.findById(id);
+  }
+
   async getServicesByOperator(operatorId: string) {
     return await repository.findByOperator(operatorId);
   }
 
   async createService(data: Partial<IService>, userId?: string) {
-    if (!data.equipment) throw new Error('Equipamento é obrigatório');
+    if (!data.equipments || data.equipments.length === 0) throw new Error('Ao menos um equipamento é obrigatório');
     
-    const equipmentId = data.equipment.toString();
+    for (const equipmentId of data.equipments) {
+      const eqIdStr = equipmentId.toString();
 
-    // 1. Regra: Equipamento não pode estar em dois serviços ativos
-    const activeService = await repository.findActiveByEquipment(equipmentId);
-    if (activeService) {
-      throw new Error('Equipamento já possui um serviço ativo/pendente.');
-    }
+      // 1. Regra: Equipamento não pode estar em dois serviços ativos
+      const activeService = await repository.findActiveByEquipment(eqIdStr);
+      if (activeService) {
+        throw new Error(`Equipamento ID ${eqIdStr} já possui um serviço ativo/pendente.`);
+      }
 
-    // 2. Regra: Equipamento deve estar com manutenção em dia (Removido bloqueio por status manual)
-    const equipment = await equipmentRepository.findById(equipmentId);
-    if (!equipment) throw new Error('Equipamento não encontrado');
-    
-    if (equipment.nextMaintenance && equipment.nextMaintenance < new Date()) {
-      throw new Error('Manutenção do equipamento vencida.');
-    }
+      // 2. Regra: Equipamento deve estar com manutenção em dia
+      const equipment = await equipmentRepository.findById(eqIdStr);
+      if (!equipment) throw new Error(`Equipamento ID ${eqIdStr} não encontrado`);
+      
+      if (equipment.nextMaintenance && equipment.nextMaintenance < new Date()) {
+        throw new Error(`Manutenção do equipamento ${equipment.name} vencida.`);
+      }
 
-    // 3. Regra: Checklist diário obrigatório
-    const todayChecklist = await checklistRepository.findTodayByEquipment(equipmentId);
-    if (!todayChecklist) {
-      throw new Error('Checklist diário não realizado para este equipamento.');
+      // 3. Regra: Checklist diário obrigatório
+      const todayChecklist = await checklistRepository.findTodayByEquipment(eqIdStr);
+      if (!todayChecklist) {
+        throw new Error(`Checklist diário não realizado para o equipamento ${equipment.name}.`);
+      }
     }
 
     // 4. Regra: Validar operadores (NRs e CNH)
@@ -83,6 +89,32 @@ export class ServiceService {
 
     if (userId) {
       await auditLog.log(userId, 'UPDATE', 'Service', id, { status: updated.status });
+    }
+
+    return updated;
+  }
+
+  async deleteService(id: string, userId?: string) {
+    const deleted = await repository.delete(id);
+    if (!deleted) {
+      throw new Error('Serviço não encontrado');
+    }
+
+    if (userId) {
+      await auditLog.log(userId, 'DELETE', 'Service', id, { title: deleted.title });
+    }
+
+    return deleted;
+  }
+
+  async addOccurrence(id: string, occurrence: any, userId?: string) {
+    const updated = await repository.addOccurrence(id, occurrence);
+    if (!updated) {
+      throw new Error('Serviço não encontrado');
+    }
+
+    if (userId) {
+      await auditLog.log(userId, 'UPDATE', 'Service', id, { occurrence: occurrence.type });
     }
 
     return updated;

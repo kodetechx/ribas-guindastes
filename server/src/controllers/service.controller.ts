@@ -9,7 +9,20 @@ export class ServiceController {
   public async getAll(req: Request, res: Response): Promise<void> {
     try {
       const services = await service.getAllServices();
-      res.status(200).json(services);
+      res.json(services);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+  public async getById(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await service.getServiceById(req.params.id);
+      if (!result) {
+        res.status(404).json({ message: 'Serviço não encontrado' });
+        return;
+      }
+      res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -17,8 +30,8 @@ export class ServiceController {
 
   public async getByOperator(req: Request, res: Response): Promise<void> {
     try {
-      const services = await service.getServicesByOperator(String(req.params.operatorId));
-      res.status(200).json(services);
+      const services = await service.getServicesByOperator(req.params.operatorId);
+      res.json(services);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -36,6 +49,24 @@ export class ServiceController {
   public async update(req: any, res: Response): Promise<void> {
     try {
       const updated = await service.updateService(String(req.params.id), req.body, req.user?.id);
+      res.status(200).json(updated);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  public async delete(req: any, res: Response): Promise<void> {
+    try {
+      await service.deleteService(String(req.params.id), req.user?.id);
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+
+  public async addOccurrence(req: any, res: Response): Promise<void> {
+    try {
+      const updated = await service.addOccurrence(String(req.params.id), req.body, req.user?.id);
       res.status(200).json(updated);
     } catch (error: any) {
       res.status(400).json({ message: error.message });

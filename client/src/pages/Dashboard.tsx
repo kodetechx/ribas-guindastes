@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Truck, FileWarning, CheckSquare, Clock, User, Search, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Truck, FileWarning, CheckSquare, Clock, User, Search, X, ExternalLink } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import api from '../services/api';
 import { formatDateUTC } from '../utils/dateUtils';
@@ -133,11 +134,12 @@ const Dashboard = () => {
             {filteredMaint.length > 0 ? (
               <div className="space-y-3">
                 {filteredMaint.map((m: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-sm">
-                    <div className="flex items-center gap-3">
+                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-sm group hover:border-blue-200 transition-colors">
+                    <Link to={`/equipamentos/${m._id || m.id}`} className="flex items-center gap-3 hover:text-blue-900 transition-colors">
                       <Clock size={14} className="text-yellow-600" />
-                      <span className="font-bold text-xs text-gray-700 uppercase">{m.name}</span>
-                    </div>
+                      <span className="font-bold text-xs text-gray-700 uppercase group-hover:text-blue-900">{m.name}</span>
+                      <ExternalLink size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
                     <span className="text-[10px] font-mono font-bold text-gray-400">
                       {formatDateUTC(m.nextMaintenance)}
                     </span>
@@ -178,11 +180,17 @@ const Dashboard = () => {
             {filteredDocs.length > 0 ? (
               <div className="space-y-3">
                 {filteredDocs.map((m: any, idx: number) => (
-                  <div key={idx} className={`flex items-center justify-between p-3 border rounded-sm ${m.status === 'expired' ? 'bg-red-50 border-red-100' : 'bg-orange-50 border-orange-100'}`}>
-                    <div>
-                      <p className={`text-xs font-black uppercase tracking-tight ${m.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>{m.name}</p>
+                  <div key={idx} className={`flex items-center justify-between p-3 border rounded-sm transition-colors group ${m.status === 'expired' ? 'bg-red-50 border-red-100' : 'bg-orange-50 border-orange-100'}`}>
+                    <Link 
+                      to={m.category === 'operator' ? `/operadores/${m.id}` : `/equipamentos/${m.id}`}
+                      className="block hover:opacity-80 transition-opacity"
+                    >
+                      <p className={`text-xs font-black uppercase tracking-tight flex items-center gap-2 ${m.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>
+                        {m.name}
+                        <ExternalLink size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </p>
                       <p className={`text-[9px] font-black uppercase ${m.status === 'expired' ? 'text-red-700' : 'text-orange-700'}`}>{m.docType}</p>
-                    </div>
+                    </Link>
                     <span className={`text-[10px] font-mono font-bold ${m.status === 'expired' ? 'text-red-900' : 'text-orange-900'}`}>
                       {formatDateUTC(m.expiresAt)}
                     </span>
@@ -223,15 +231,18 @@ const Dashboard = () => {
             {filteredChecklists.length > 0 ? (
               <div className="space-y-3">
                 {filteredChecklists.map((c: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between p-3 border-b border-gray-50 last:border-0">
+                  <div key={idx} className="flex items-center justify-between p-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className={`w-1.5 h-1.5 rounded-full ${c.isApproved ? 'bg-green-500' : 'bg-red-500'}`} />
                       <div>
-                        <p className="text-xs font-black text-gray-800 uppercase tracking-tight">{c.equipment?.name}</p>
-                        <div className="flex items-center gap-1 text-[9px] text-gray-400 font-bold uppercase">
+                        <Link to={`/equipamentos/${c.equipment?._id}`} className="text-xs font-black text-gray-800 uppercase tracking-tight hover:text-blue-900 transition-colors flex items-center gap-1">
+                          {c.equipment?.name}
+                          <ExternalLink size={8} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                        <Link to={`/operadores/${c.operator?._id}`} className="flex items-center gap-1 text-[9px] text-gray-400 font-bold uppercase hover:text-blue-700 transition-colors">
                           <User size={10} />
                           {c.operator?.name}
-                        </div>
+                        </Link>
                       </div>
                     </div>
                     <span className="text-[10px] font-mono text-gray-400 font-bold">
