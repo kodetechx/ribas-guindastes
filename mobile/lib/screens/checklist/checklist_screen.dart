@@ -27,84 +27,63 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
     exportBackgroundColor: Colors.white,
   );
 
-  final List<Map<String, dynamic>> _checkItems = [
-    {
-      'label': 'Nível de óleo do motor',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': false
-    },
-    {
-      'label': 'Nível de líquido de arrefecimento',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': false
-    },
-    {
-      'label': 'Estado dos pneus / lagartas',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': true
-    },
-    {
-      'label': 'Funcionamento dos freios',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': false
-    },
-    {
-      'label': 'Iluminação e sinalização',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': true
-    },
-    {
-      'label': 'Dispositivos de segurança (botão de emergência, etc.)',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': true
-    },
-    {
-      'label': 'Integridade estrutural (trincas, vazamentos)',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': true
-    },
-    {
-      'label': 'Painel de instrumentos',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': true
-    },
-    {
-      'label': 'Sinal sonoro de ré',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': false
-    },
-    {
-      'label': 'Extintor de incêndio',
-      'status': 'ok',
-      'controller': TextEditingController(),
-      'photo': null,
-      'hasPhoto': true
-    },
-  ];
+  final List<Map<String, dynamic>> _checkItems = [];
+  bool _isLoadingTemplate = false;
 
   @override
   void initState() {
     super.initState();
     _currentEquipment = widget.selectedEquipment;
+    if (_currentEquipment != null) {
+      _loadTemplate();
+    }
     Provider.of<EquipmentProvider>(context, listen: false).fetchEquipments();
+  }
+
+  Future<void> _loadTemplate() async {
+    if (_currentEquipment?.checklistTemplateId == null) {
+      setState(() {
+        _checkItems.clear();
+        // Add a default item if no template is found to avoid empty list
+        _checkItems.add({
+          'label': 'Inspeção Geral',
+          'status': 'ok',
+          'controller': TextEditingController(),
+          'photo': null,
+          'hasPhoto': true
+        });
+      });
+      return;
+    }
+
+    setState(() => _isLoadingTemplate = true);
+
+    try {
+      final template = await Provider.of<ChecklistProvider>(context, listen: false)
+          .fetchTemplate(_currentEquipment!.checklistTemplateId!);
+
+      if (template != null) {
+        setState(() {
+          _checkItems.clear();
+          for (var item in template.items) {
+            _checkItems.add({
+              'label': item.label,
+              'status': 'ok',
+              'controller': TextEditingController(),
+              'photo': null,
+              'hasPhoto': true, // All dynamic items can have photo for now
+              'required': item.required,
+            });
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading checklist template: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingTemplate = false);
+      }
+    }
   }
 
   @override
@@ -290,7 +269,12 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                         child: Text(e.name, style: const TextStyle(fontSize: 15)),
                       );
                     }).toList(),
-                    onChanged: (val) => setState(() => _currentEquipment = val),
+                    onChanged: (val) {
+                      setState(() => _currentEquipment = val);
+                      if (val != null) {
+                        _loadTemplate();
+                      }
+                    },
                     decoration: const InputDecoration(
                       labelText: 'Selecione o Equipamento',
                       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -316,11 +300,26 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF666666), letterSpacing: 1.0),
             ),
             const SizedBox(height: 10),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _checkItems.length,
-              itemBuilder: (ctx, index) {
+            if (_isLoadingTemplate)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (_checkItems.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text('Selecione um equipamento para carregar o checklist.'),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _checkItems.length,
+                itemBuilder: (ctx, index) {
                 final item = _checkItems[index];
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),

@@ -68,12 +68,21 @@ class _HomeTabState extends State<HomeTab> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final equipmentProvider = Provider.of<EquipmentProvider>(context, listen: false);
       
-      // 1. Validate Operator NRs (Offline: use cached data)
+      // 1. Validate Operator NRs and CNH (Offline: use cached data)
       final user = authProvider.user;
-      if (user != null && user.nrs != null) {
-        final hasExpiredNr = user.nrs!.any((nr) => nr.expiresAt.isBefore(DateTime.now()));
-        if (hasExpiredNr) {
-          _showBlockingError(context, 'Bloqueio de Segurança', 'Você possui certificações NR vencidas. Procure o RH para regularização antes de operar.');
+      if (user != null) {
+        // Check NRs
+        if (user.nrs != null) {
+          final hasExpiredNr = user.nrs!.any((nr) => nr.expiresAt.isBefore(DateTime.now()));
+          if (hasExpiredNr) {
+            _showBlockingError(context, 'Bloqueio de Segurança', 'Você possui certificações NR vencidas. Procure o RH para regularização antes de operar.');
+            return;
+          }
+        }
+        
+        // Check CNH
+        if (user.cnh != null && user.cnh!.expiresAt.isBefore(DateTime.now())) {
+          _showBlockingError(context, 'Habilitação Vencida', 'Sua CNH está vencida. Você não pode operar equipamentos até que a renovação seja comprovada.');
           return;
         }
       }
@@ -243,10 +252,12 @@ class _HomeTabState extends State<HomeTab> {
                           CircleAvatar(
                             radius: 28,
                             backgroundColor: const Color(0xFFE0E0E0),
-                            backgroundImage: user?.photoUrl != null 
-                                ? NetworkImage(_apiService.getFullUrl(user!.photoUrl!)) 
+                            backgroundImage: (user?.avatarUrl != null || user?.photoUrl != null) 
+                                ? NetworkImage(_apiService.getFullUrl(user?.avatarUrl ?? user!.photoUrl!)) 
                                 : null,
-                            child: user?.photoUrl == null ? const Icon(Icons.person_outline, color: Color(0xFF666666), size: 28) : null,
+                            child: (user?.avatarUrl == null && user?.photoUrl == null) 
+                                ? const Icon(Icons.person_outline, color: Color(0xFF666666), size: 28) 
+                                : null,
                           ),
                           const SizedBox(width: 16),
                           Expanded(

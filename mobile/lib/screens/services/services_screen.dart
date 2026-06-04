@@ -153,7 +153,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
     final success = await Provider.of<WorkProvider>(context, listen: false).startWork(
       {
         'title': service.title,
-        'client': service.client,
+        'clientId': service.clientId,
         'location': service.location,
         'equipment': service.equipmentId,
         'operators': service.operatorIds,

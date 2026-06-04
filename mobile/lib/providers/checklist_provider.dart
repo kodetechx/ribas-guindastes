@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/local_database_service.dart';
 import '../services/connectivity_service.dart';
+import '../models/checklist_template.dart';
 
 class ChecklistProvider with ChangeNotifier {
   bool _isLoading = false;
@@ -20,6 +21,23 @@ class ChecklistProvider with ChangeNotifier {
         syncPendingChecklists();
       }
     });
+  }
+
+  Future<ChecklistTemplate?> fetchTemplate(String templateId) async {
+    final bool isOnline = await _connectivity.isConnected;
+    
+    if (isOnline) {
+      try {
+        final response = await _apiService.get('/checklist-templates/$templateId');
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          return ChecklistTemplate.fromJson(data);
+        }
+      } catch (e) {
+        debugPrint('Fetch template error: $e');
+      }
+    }
+    return null;
   }
 
   Future<Map<String, dynamic>> submitChecklist(Map<String, dynamic> data) async {

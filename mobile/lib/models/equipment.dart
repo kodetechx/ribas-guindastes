@@ -1,3 +1,4 @@
+import 'customer.dart';
 class Equipment {
   final String id;
   final String name;
@@ -8,6 +9,7 @@ class Equipment {
   final String status; // 'active', 'maintenance', 'blocked'
   final String? qrCode;
   final List<String> documents;
+  final String? checklistTemplateId;
   final DateTime? lastMaintenance;
   final DateTime? nextMaintenance;
   final String? imageUrl;
@@ -23,6 +25,7 @@ class Equipment {
     required this.status,
     this.qrCode,
     required this.documents,
+    this.checklistTemplateId,
     this.lastMaintenance,
     this.nextMaintenance,
     this.imageUrl,
@@ -40,6 +43,7 @@ class Equipment {
       status: json['status'] ?? 'active',
       qrCode: json['qrCode'],
       documents: List<String>.from(json['documents'] ?? []),
+      checklistTemplateId: json['checklistTemplateId'],
       lastMaintenance: json['lastMaintenance'] != null ? DateTime.parse(json['lastMaintenance']) : null,
       nextMaintenance: json['nextMaintenance'] != null ? DateTime.parse(json['nextMaintenance']) : null,
       imageUrl: json['imageUrl'],
@@ -54,4 +58,22 @@ class Equipment {
 
   @override
   int get hashCode => id.hashCode;
+
+  /// Validates if equipment satisfies customer's required documentation and status
+  bool isValidForCustomer(Customer customer) {
+    // 1. Check status
+    if (status != 'active') return false;
+
+    // 2. Check maintenance
+    if (nextMaintenance != null && nextMaintenance!.isBefore(DateTime.now())) {
+      return false;
+    }
+
+    // 3. Check specific documentation required by customer
+    for (final docId in customer.specificDocumentation) {
+      if (!documents.contains(docId)) return false;
+    }
+
+    return true;
+  }
 }

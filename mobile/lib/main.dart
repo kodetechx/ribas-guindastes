@@ -174,7 +174,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
 
         if (authProvider.isAuthenticated) {
-        return const DashboardScreen();
+          return const DashboardScreen();
         } else {
           return const LoginScreen();
         }

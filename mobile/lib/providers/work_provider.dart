@@ -66,14 +66,8 @@ class WorkProvider with ChangeNotifier {
   }
 
   Future<bool> startWork(Map<String, dynamic> data, {String? serviceId}) async {
-    // Starting/Finishing work usually requires being online in this business model
-    // unless we implement full background sync for service status changes.
-    // For now, let's keep it as an online-only action but with proper feedback.
     final bool isOnline = await _connectivity.isConnected;
-    if (!isOnline) {
-      debugPrint('Cannot start work while offline');
-      return false;
-    }
+    if (!isOnline) return false;
 
     _isLoading = true;
     notifyListeners();
@@ -84,6 +78,12 @@ class WorkProvider with ChangeNotifier {
         'status': 'in_progress',
         'startDate': DateTime.now().toIso8601String(),
       };
+
+      // Ensure equipment is sent as equipments array if present
+      if (body.containsKey('equipment')) {
+        body['equipments'] = [body['equipment']];
+        body.remove('equipment');
+      }
 
       final response = serviceId != null
           ? await _apiService.put('/services/$serviceId', body)

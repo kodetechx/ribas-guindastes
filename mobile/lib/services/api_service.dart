@@ -6,14 +6,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ApiService {
+  static final ApiService instance = ApiService._internal();
+  factory ApiService() => instance;
+  ApiService._internal();
+
   static String get defaultBaseUrl {
     return 'https://ribas-guindastes.onrender.com/api';
   }
 
-  final String baseUrl;
-  
-  ApiService({String? baseUrl}) : baseUrl = baseUrl ?? defaultBaseUrl;
-  
+  final String baseUrl = defaultBaseUrl;
   final _storage = const FlutterSecureStorage();
 
   Future<String?> getToken() async {
@@ -76,25 +77,33 @@ class ApiService {
   }
 
   Future<File> downloadFile(String url, String fileName) async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/$fileName');
 
-    // Simple cache: if file exists and has size > 0, return it
-    if (await file.exists() && await file.length() > 0) {
-      debugPrint('Usando arquivo em cache: $fileName');
-      return file;
-    }
-
     try {
-      debugPrint('Baixando arquivo: $url');
+      debugPrint('Iniciando download: $url');
       final headers = await _getHeaders();
       final response = await http.get(Uri.parse(url), headers: headers);
+      
+      if (response.statusCode != 200) {
+        throw Exception('Erro no servidor: ${response.statusCode}');
+      }
+
       final bytes = response.bodyBytes;
+      
+      // Verificação básica de cabeçalho PDF (%PDF-)
+      if (fileName.toLowerCase().endsWith('.pdf')) {
+        if (bytes.length < 4 || 
+            bytes[0] != 0x25 || bytes[1] != 0x50 || bytes[2] != 0x44 || bytes[3] != 0x46) {
+          throw Exception('O arquivo baixado não é um PDF válido');
+        }
+      }
+
       await file.writeAsBytes(bytes);
+      debugPrint('Download concluído: ${bytes.length} bytes');
       return file;
     } catch (e) {
       debugPrint('Erro no download: $e');
-      if (await file.exists()) return file; // Fallback to old file if exists
       rethrow;
     }
   }
