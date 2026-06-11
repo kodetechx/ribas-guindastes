@@ -38,7 +38,7 @@ export const generateServiceOrderPDF = (service: any) => {
     ],
     theme: 'plain',
     styles: { fontSize: 9, cellPadding: 2 },
-    columnStyles: { 0: { fontStyle: 'bold', width: 40 } }
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 40 } }
   });
 
   // 2. Equipments

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertTriangle, Camera, Clock } from 'lucide-react';
+import { X, AlertTriangle, Clock } from 'lucide-react';
 import api from '../services/api';
 
 interface Props {

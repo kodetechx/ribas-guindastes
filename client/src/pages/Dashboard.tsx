@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Truck, FileWarning, CheckSquare, Clock, User, Search, X, ExternalLink } from 'lucide-react';
+import { Truck, CheckSquare, Clock, User, Search, X, ExternalLink } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import api from '../services/api';
 import { formatDateUTC } from '../utils/dateUtils';
