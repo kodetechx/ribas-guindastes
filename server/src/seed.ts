@@ -181,7 +181,7 @@ const seedDB = async () => {
         title: 'Manutenção em Refinaria',
         clientId: clients[0]._id,
         location: 'Duarte da Costa, RJ',
-        equipment: equipments[0]._id,
+        equipments: [equipments[0]._id],
         operators: [operators[0]._id],
         status: 'in_progress',
         startDate: new Date()
@@ -190,7 +190,7 @@ const seedDB = async () => {
         title: 'Carga e Descarga de Minério',
         clientId: clients[1]._id,
         location: 'Mina do Sossego, PA',
-        equipment: equipments[1]._id,
+        equipments: [equipments[1]._id],
         operators: [operators[1]._id],
         status: 'pending',
         startDate: new Date()

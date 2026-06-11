@@ -15,7 +15,7 @@ export class ChecklistTemplateController {
 
   async getById(req: Request, res: Response) {
     try {
-      const template = await service.getTemplateById(req.params.id);
+      const template = await service.getTemplateById(req.params.id as string);
       res.json(template);
     } catch (error) {
       res.status(404).json({ message: (error as Error).message });

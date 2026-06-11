@@ -17,7 +17,7 @@ export class ServiceController {
 
   public async getById(req: Request, res: Response): Promise<void> {
     try {
-      const result = await service.getServiceById(req.params.id);
+      const result = await service.getServiceById(req.params.id as string);
       if (!result) {
         res.status(404).json({ message: 'Serviço não encontrado' });
         return;
@@ -30,7 +30,7 @@ export class ServiceController {
 
   public async getByOperator(req: Request, res: Response): Promise<void> {
     try {
-      const services = await service.getServicesByOperator(req.params.operatorId);
+      const services = await service.getServicesByOperator(req.params.operatorId as string);
       res.json(services);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
